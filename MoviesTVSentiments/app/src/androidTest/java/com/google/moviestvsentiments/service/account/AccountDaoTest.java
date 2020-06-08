@@ -82,16 +82,16 @@ public class AccountDaoTest {
     }
 
     @Test
-    public void setIsCurrent_nonexistentAccount_returns0() {
-        int updated = accountDao.setIsCurrent("Nonexistent Account", false);
-        assertEquals(0, updated);
+    public void setIsCurrent_nonexistentAccount_returnsFalse() {
+        boolean updated = accountDao.setIsCurrent("Nonexistent Account", false);
+        assertFalse(updated);
     }
 
     @Test
-    public void setIsCurrent_existingAccount_returns1() {
+    public void setIsCurrent_existingAccount_returnsTrue() {
         accountDao.addAccount("Existing Account");
-        int updated = accountDao.setIsCurrent("Existing Account", false);
-        assertEquals(1, updated);
+        boolean updated = accountDao.setIsCurrent("Existing Account", false);
+        assertTrue(updated);
     }
 
     @Test

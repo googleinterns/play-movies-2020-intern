@@ -6,37 +6,44 @@ import com.google.moviestvsentiments.model.Account;
 import java.util.List;
 
 /**
- * AccountDao provides a high-level interface for querying the accounts database table.
+ * A high-level interface for querying the accounts database table.
  */
 @Dao
-public interface AccountDao {
+public abstract class AccountDao {
 
     /**
-     * addAccount adds the given account name into the accounts table. If the name already exists,
+     * Adds the given account name into the accounts table. If the name already exists,
      * it is ignored. The account record is created with is_current set to false.
      * @param name The name of the account to add.
      */
     @Query("INSERT OR IGNORE INTO accounts_table (account_name) VALUES (:name)")
-    public void addAccount(String name);
+    public abstract void addAccount(String name);
 
     /**
-     * getAlphabetizedAccounts returns a list of all accounts in alphabetical order.
+     * Returns a list of all accounts in alphabetical order.
      */
     @Query("SELECT * FROM accounts_table ORDER BY account_name ASC")
-    public List<Account> getAlphabetizedAccounts();
+    public abstract List<Account> getAlphabetizedAccounts();
 
     /**
-     * @return The currently in-use account.
+     * Returns the currently signed-in account or null if all accounts are signed-out.
      */
     @Query("SELECT * FROM accounts_table WHERE is_current = 1")
-    public Account getCurrentAccount();
+    public abstract Account getCurrentAccount();
 
     /**
      * Updates the given account record's is_current value.
      * @param name The name of the account to update.
      * @param isCurrent The value to set is_current to.
-     * @return The number of updated records. This will be 1 if the account exists and 0 otherwise.
+     * @return True if the record exists and was updated successfully.
      */
+    public boolean setIsCurrent(String name, boolean isCurrent) {
+        int updated = setIsCurrentQuery(name, isCurrent);
+        return updated > 0;
+    }
+
+    // Room update query methods can only have void or int return types, so this method exists
+    // to allow the public API to return a boolean.
     @Query("UPDATE accounts_table SET is_current = :isCurrent WHERE account_name = :name")
-    public int setIsCurrent(String name, boolean isCurrent);
+    protected abstract int setIsCurrentQuery(String name, boolean isCurrent);
 }

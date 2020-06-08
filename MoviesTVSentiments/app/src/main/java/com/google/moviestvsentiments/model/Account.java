@@ -6,7 +6,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 /**
- * Account represents a record in the accounts_table.
+ * A record in the accounts database table.
  */
 @Entity(tableName = "accounts_table")
 public class Account {
