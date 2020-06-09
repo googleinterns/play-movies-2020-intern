@@ -29,6 +29,10 @@ public class Asset {
     public String poster;
 
     @NonNull
+    @ColumnInfo(name = "banner")
+    public String banner;
+
+    @NonNull
     @ColumnInfo(name = "plot")
     public String plot;
 
