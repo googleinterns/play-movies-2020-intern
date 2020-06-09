@@ -3,13 +3,11 @@ package com.google.moviestvsentiments.model;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.TypeConverters;
 
 /**
  * A record in the assets database table.
  */
 @Entity(tableName = "assets_table", primaryKeys = {"asset_id", "asset_type"})
-@TypeConverters({AssetType.class})
 public class Asset {
 
     @NonNull
@@ -53,4 +51,20 @@ public class Asset {
 
     @ColumnInfo(name = "rt_rating")
     public String rottenTomatoesRating;
+    
+    public Asset(String id, AssetType type, String title, String poster, String banner, String plot,
+                 String runtime, String year, long timestamp, String imdbRating,
+                 String rottenTomatoesRating) {
+        this.id = id;
+        this.type = type;
+        this.title = title;
+        this.poster = poster;
+        this.banner = banner;
+        this.plot = plot;
+        this.runtime = runtime;
+        this.year = year;
+        this.timestamp = timestamp;
+        this.imdbRating = imdbRating;
+        this.rottenTomatoesRating = rottenTomatoesRating;
+    }
 }
