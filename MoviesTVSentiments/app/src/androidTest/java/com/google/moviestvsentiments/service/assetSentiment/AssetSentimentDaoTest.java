@@ -20,15 +20,16 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class AssetSentimentDaoTest {
 
+    private static final Asset MOVIE_ASSET = Asset.builder().setId("assetId")
+            .setType(AssetType.MOVIE).setTitle("assetTitle").setPoster("posterURL")
+            .setBanner("bannerURL").setPlot("plotDescription").setRuntime("runtime").setYear("year")
+            .setTimestamp(1).build();
+
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     private AssetSentimentDao assetSentimentDao;
     private SentimentsDatabase database;
-    private Asset asset = Asset.builder().setId("assetId")
-            .setType(AssetType.MOVIE).setTitle("assetTitle").setPoster("posterURL")
-            .setBanner("bannerURL").setPlot("plotDescription").setRuntime("runtime").setYear("year")
-            .setTimestamp(1).build();
 
     @Before
     public void createDatabase() {
@@ -45,7 +46,7 @@ public class AssetSentimentDaoTest {
 
     @Test
     public void addAndGetAsset_withIncorrectId_returnsNull() {
-        assetSentimentDao.addAsset(asset);
+        assetSentimentDao.addAsset(MOVIE_ASSET);
         Asset result = assetSentimentDao.getAsset("incorrectId", AssetType.MOVIE);
 
         assertNull(result);
@@ -53,7 +54,7 @@ public class AssetSentimentDaoTest {
 
     @Test
     public void addAndGetAsset_withIncorrectType_returnsNull() {
-        assetSentimentDao.addAsset(asset);
+        assetSentimentDao.addAsset(MOVIE_ASSET);
         Asset result = assetSentimentDao.getAsset("assetId", AssetType.SHOW);
 
         assertNull(result);
@@ -61,7 +62,7 @@ public class AssetSentimentDaoTest {
 
     @Test
     public void addAndGetAsset_returnsAsset() {
-        assetSentimentDao.addAsset(asset);
+        assetSentimentDao.addAsset(MOVIE_ASSET);
         Asset result = assetSentimentDao.getAsset("assetId", AssetType.MOVIE);
 
         assertEquals("assetTitle", result.title());
