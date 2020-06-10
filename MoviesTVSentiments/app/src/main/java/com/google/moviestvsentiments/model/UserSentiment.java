@@ -3,16 +3,12 @@ package com.google.moviestvsentiments.model;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.TypeConverters;
 
 /**
  * A record in the user sentiments database table
  */
-@Entity(tableName = "user_sentiments_table", primaryKeys = {"asset_id", "account_name",
-    "asset_type"}, foreignKeys = @ForeignKey(entity = Asset.class, parentColumns = "asset_id",
-    childColumns = "asset_id", onDelete = ForeignKey.CASCADE))
-@TypeConverters({AssetType.class, SentimentType.class})
+@Entity(tableName = "user_sentiments_table",
+        primaryKeys = {"asset_id", "account_name", "asset_type"})
 public class UserSentiment {
 
     @NonNull
