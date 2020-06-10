@@ -2,13 +2,17 @@ package com.google.moviestvsentiments.service.assetSentiment;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.provider.Telephony;
+
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.room.Room;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.moviestvsentiments.model.Asset;
+import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
@@ -53,7 +57,7 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_withIncorrectId_returnsNull() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        Asset result = assetSentimentDao.getAsset("incorrectId", AssetType.MOVIE);
+        AssetSentiment result = assetSentimentDao.getAsset("accountName", "incorrectId", AssetType.MOVIE);
 
         assertNull(result);
     }
@@ -61,7 +65,7 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_withIncorrectType_returnsNull() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        Asset result = assetSentimentDao.getAsset("assetId", AssetType.SHOW);
+        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.SHOW);
 
         assertNull(result);
     }
@@ -69,9 +73,28 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_returnsAsset() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        Asset result = assetSentimentDao.getAsset("assetId", AssetType.MOVIE);
+        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.MOVIE);
 
-        assertEquals("assetTitle", result.title());
+        assertEquals("assetTitle", result.asset.title());
+    }
+
+    @Test
+    public void addAndGetAsset_withNoSentiment_returnsUnspecified() {
+        assetSentimentDao.addAsset(MOVIE_ASSET);
+        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.MOVIE);
+
+        assertEquals(SentimentType.UNSPECIFIED, result.sentimentType);
+    }
+
+    @Test
+    public void addAndGetAsset_withSentiment_returnsSentiment() {
+        assetSentimentDao.addAsset(MOVIE_ASSET);
+        assetSentimentDao.updateSentiment("accountName", "assetId",
+                AssetType.MOVIE, SentimentType.THUMBS_UP);
+
+        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.MOVIE);
+
+        assertEquals(SentimentType.THUMBS_UP, result.sentimentType);
     }
 
     @Test
@@ -80,7 +103,7 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.UNSPECIFIED);
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.SHOW, "accountName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.SHOW, "accountName",
                 SentimentType.UNSPECIFIED);
 
         assertEquals(0, results.size());
@@ -92,7 +115,7 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.MOVIE, "incorrectName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "incorrectName",
                 SentimentType.THUMBS_UP);
 
         assertEquals(0, results.size());
@@ -104,7 +127,7 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
                 SentimentType.THUMBS_DOWN);
 
         assertEquals(0, results.size());
@@ -119,12 +142,25 @@ public class AssetSentimentDaoTest {
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         assetSentimentDao.updateSentiment("accountName", "assetId2",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
                 SentimentType.THUMBS_UP);
 
         assertEquals(2, results.size());
-        assertEquals("assetId", results.get(0).id());
-        assertEquals("assetId2", results.get(1).id());
+        assertEquals("assetId", results.get(0).asset.id());
+        assertEquals("assetId2", results.get(1).asset.id());
+    }
+
+    @Test
+    public void updateSentimentAndGetAssets_returnsSentimentValue() {
+        assetSentimentDao.addAsset(MOVIE_ASSET);
+
+        assetSentimentDao.updateSentiment("accountName", "assetId",
+                AssetType.MOVIE, SentimentType.THUMBS_DOWN);
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+                SentimentType.THUMBS_DOWN);
+
+        assertEquals(1, results.size());
+        assertEquals(SentimentType.THUMBS_DOWN, results.get(0).sentimentType);
     }
 
     @Test
@@ -134,12 +170,27 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.UNSPECIFIED);
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
                 SentimentType.UNSPECIFIED);
 
         assertEquals(2, results.size());
-        assertEquals("assetId", results.get(0).id());
-        assertEquals("assetId2", results.get(1).id());
+        assertEquals("assetId", results.get(0).asset.id());
+        assertEquals("assetId2", results.get(1).asset.id());
+    }
+
+    @Test
+    public void updateSentimentAndGetAssets_unspecifiedSentiment_returnsSentimentValue() {
+        assetSentimentDao.addAsset(MOVIE_ASSET);
+        assetSentimentDao.addAsset(MOVIE_ASSET_2);
+
+        assetSentimentDao.updateSentiment("accountName", "assetId",
+                AssetType.MOVIE, SentimentType.UNSPECIFIED);
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+                SentimentType.UNSPECIFIED);
+
+        assertEquals(2, results.size());
+        assertEquals(SentimentType.UNSPECIFIED, results.get(0).sentimentType);
+        assertEquals(SentimentType.UNSPECIFIED, results.get(1).sentimentType);
     }
 
     @Test
@@ -149,7 +200,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         assetSentimentDao.deleteAllSentiments("accountName");
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
                 SentimentType.THUMBS_UP);
 
         assertEquals(0, results.size());
@@ -162,10 +213,10 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         assetSentimentDao.deleteAllSentiments("otherName");
-        List<Asset> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
+        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
                 SentimentType.THUMBS_UP);
 
         assertEquals(1, results.size());
-        assertEquals("assetTitle", results.get(0).title());
+        assertEquals("assetTitle", results.get(0).asset.title());
     }
 }
