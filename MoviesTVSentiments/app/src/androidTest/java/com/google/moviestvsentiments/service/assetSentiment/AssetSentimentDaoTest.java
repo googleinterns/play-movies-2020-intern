@@ -25,6 +25,10 @@ public class AssetSentimentDaoTest {
 
     private AssetSentimentDao assetSentimentDao;
     private SentimentsDatabase database;
+    private Asset asset = Asset.builder().setId("assetId")
+            .setType(AssetType.MOVIE).setTitle("assetTitle").setPoster("posterURL")
+            .setBanner("bannerURL").setPlot("plotDescription").setRuntime("runtime").setYear("year")
+            .setTimestamp(1).build();
 
     @Before
     public void createDatabase() {
@@ -41,31 +45,25 @@ public class AssetSentimentDaoTest {
 
     @Test
     public void addAndGetAsset_withIncorrectId_returnsNull() {
-        Asset asset = new Asset("assetId", AssetType.MOVIE, "assetTitle", "posterURL",
-                "bannerURL", "plotDescription", "runtime", "year",
-                1, "imdbRating", "rtRating");
         assetSentimentDao.addAsset(asset);
-        asset = assetSentimentDao.getAsset("incorrectId", AssetType.MOVIE);
-        assertNull(asset);
+        Asset result = assetSentimentDao.getAsset("incorrectId", AssetType.MOVIE);
+
+        assertNull(result);
     }
 
     @Test
     public void addAndGetAsset_withIncorrectType_returnsNull() {
-        Asset asset = new Asset("assetId", AssetType.MOVIE, "assetTitle", "posterURL",
-                "bannerURL", "plotDescription", "runtime", "year",
-                1,"imdbRating", "rtRating");
         assetSentimentDao.addAsset(asset);
-        asset = assetSentimentDao.getAsset("assetId", AssetType.SHOW);
-        assertNull(asset);
+        Asset result = assetSentimentDao.getAsset("assetId", AssetType.SHOW);
+
+        assertNull(result);
     }
 
     @Test
     public void addAndGetAsset_returnsAsset() {
-        Asset asset = new Asset("assetId", AssetType.MOVIE, "assetTitle", "posterURL",
-                "bannerURL", "plotDescription", "runtime", "year",
-                1,"imdbRating", "rtRating");
         assetSentimentDao.addAsset(asset);
         Asset result = assetSentimentDao.getAsset("assetId", AssetType.MOVIE);
-        assertEquals("assetTitle", result.title);
+
+        assertEquals("assetTitle", result.title());
     }
 }

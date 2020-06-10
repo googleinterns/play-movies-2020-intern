@@ -6,8 +6,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetType;
-import com.google.moviestvsentiments.model.SentimentType;
-import java.util.List;
 
 @Dao
 public abstract class AssetSentimentDao {
