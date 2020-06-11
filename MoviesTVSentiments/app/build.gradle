@@ -50,4 +50,6 @@ dependencies {
 
     // Testing
     androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
+    androidTestImplementation 'androidx.test.ext:truth:1.0.0'
+    androidTestImplementation "com.google.truth:truth:$rootProject.truthVersion"
 }
