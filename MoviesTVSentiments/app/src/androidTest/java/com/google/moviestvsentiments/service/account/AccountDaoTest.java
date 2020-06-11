@@ -1,9 +1,6 @@
 package com.google.moviestvsentiments.service.account;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static com.google.common.truth.Truth.assertThat;
 
 import android.content.Context;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -45,22 +42,24 @@ public class AccountDaoTest {
     public void addAndGetAccount_returnsName() {
         accountDao.addAccount("John Doe");
         List<Account> accounts = accountDao.getAlphabetizedAccounts();
-        assertEquals("John Doe", accounts.get(0).name);
-        assertTrue(accounts.get(0).timestamp > 0);
+
+        assertThat(accounts.get(0).name).isEqualTo("John Doe");
     }
 
     @Test
     public void addAndGetAccount_returnsIsCurrent() {
         accountDao.addAccount("John Doe");
         List<Account> accounts = accountDao.getAlphabetizedAccounts();
-        assertFalse(accounts.get(0).isCurrent);
+
+        assertThat(accounts.get(0).isCurrent).isFalse();
     }
 
     @Test
     public void addAndGetAccount_returnsTimestamp() {
         accountDao.addAccount("John Doe");
         List<Account> accounts = accountDao.getAlphabetizedAccounts();
-        assertTrue(accounts.get(0).timestamp > 0);
+
+        assertThat(accounts.get(0).timestamp).isGreaterThan(0);
     }
 
     @Test
@@ -68,9 +67,10 @@ public class AccountDaoTest {
         accountDao.addAccount("John Doe");
         accountDao.addAccount("Jane Doe");
         List<Account> accounts = accountDao.getAlphabetizedAccounts();
-        assertEquals(2, accounts.size());
-        assertEquals("Jane Doe", accounts.get(0).name);
-        assertEquals("John Doe", accounts.get(1).name);
+
+        assertThat(accounts).hasSize(2);
+        assertThat(accounts.get(0).name).isEqualTo("Jane Doe");
+        assertThat(accounts.get(1).name).isEqualTo("John Doe");
     }
 
     @Test
@@ -78,34 +78,41 @@ public class AccountDaoTest {
         accountDao.addAccount("John Doe");
         accountDao.addAccount("John Doe");
         List<Account> accounts = accountDao.getAlphabetizedAccounts();
-        assertEquals(1, accounts.size());
+
+        assertThat(accounts).hasSize(1);
     }
 
     @Test
     public void setIsCurrent_nonexistentAccount_returnsFalse() {
         boolean updated = accountDao.setIsCurrent("Nonexistent Account", false);
-        assertFalse(updated);
+
+        assertThat(updated).isFalse();
     }
 
     @Test
     public void setIsCurrent_existingAccount_returnsTrue() {
         accountDao.addAccount("Existing Account");
+
         boolean updated = accountDao.setIsCurrent("Existing Account", false);
-        assertTrue(updated);
+
+        assertThat(updated).isTrue();
     }
 
     @Test
     public void getCurrentAccount_withNoCurrentSet_returnsNull() {
         Account account = accountDao.getCurrentAccount();
-        assertNull(account);
+
+        assertThat(account).isNull();
     }
 
     @Test
     public void getCurrentAccount_withCurrentSet_returnsAccount() {
         accountDao.addAccount("John Doe");
         accountDao.setIsCurrent("John Doe", true);
+
         Account account = accountDao.getCurrentAccount();
-        assertEquals("John Doe", account.name);
-        assertTrue(account.isCurrent);
+
+        assertThat(account.name).isEqualTo("John Doe");
+        assertThat(account.isCurrent).isTrue();
     }
 }

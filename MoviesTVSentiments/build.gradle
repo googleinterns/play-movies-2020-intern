@@ -28,4 +28,5 @@ ext {
     roomVersion = '2.2.1'
     archLifecycleVersion = '2.2.0'
     coreTestingVersion = '2.1.0'
+    truthVersion = '1.0.1'
 }
