@@ -1,5 +1,8 @@
 package com.google.moviestvsentiments.service.assetSentiment;
 
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.Observer;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -31,7 +34,8 @@ public abstract class AssetSentimentDao {
             "LEFT JOIN user_sentiments_table AS R " +
             "ON L.asset_id = R.asset_id AND account_name = :accountName AND L.asset_type = R.asset_type " +
             "WHERE L.asset_id = :assetId AND L.asset_type = :assetType")
-    public abstract AssetSentiment getAsset(String accountName, String assetId, AssetType assetType);
+    public abstract LiveData<AssetSentiment> getAsset(String accountName, String assetId,
+                                                      AssetType assetType);
 
     /**
      * Returns a list of assets matching the given type that have been reacted to with the given
@@ -42,13 +46,22 @@ public abstract class AssetSentimentDao {
      * @param sentimentType The sentiment type to check for.
      * @return A list of assets with reactions matching the given account name and sentiment type.
      */
-    public List<AssetSentiment> getAssets(AssetType assetType, String accountName,
-                                          SentimentType sentimentType) {
-        List<AssetSentiment> results = getAssetsWithSentiment(assetType, accountName, sentimentType);
-        if (sentimentType == SentimentType.UNSPECIFIED) {
-            results.addAll(getAssetsWithoutSentiment(assetType, accountName));
+    public LiveData<List<AssetSentiment>> getAssets(AssetType assetType, String accountName,
+                                                    SentimentType sentimentType) {
+        LiveData<List<AssetSentiment>> reactionResults = getAssetsWithSentiment(assetType,
+                accountName, sentimentType);
+        if (sentimentType != SentimentType.UNSPECIFIED) {
+            return reactionResults;
         }
-        return results;
+
+        LiveData<List<AssetSentiment>> noReactionResults = getAssetsWithoutSentiment(assetType,
+                accountName);
+        MediatorLiveData<List<AssetSentiment>> allResults = new MediatorLiveData<>();
+        allResults.addSource(reactionResults, values -> combineLiveDataLists(allResults, values,
+                noReactionResults));
+        allResults.addSource(noReactionResults, values -> combineLiveDataLists(allResults, values,
+                reactionResults));
+        return allResults;
     }
 
     /**
@@ -64,8 +77,8 @@ public abstract class AssetSentimentDao {
             "(SELECT * FROM user_sentiments_table AS R " +
                 "WHERE L.asset_id = R.asset_id AND account_name = :accountName " +
                 "AND asset_type = :assetType AND sentiment_type = :sentimentType)")
-    protected abstract List<AssetSentiment> getAssetsWithSentiment(AssetType assetType, String accountName,
-                                                          SentimentType sentimentType);
+    protected abstract LiveData<List<AssetSentiment>> getAssetsWithSentiment(AssetType assetType,
+                                                 String accountName, SentimentType sentimentType);
 
     /**
      * Returns a list of assets that have not been reacted to by the given account name and
@@ -80,7 +93,24 @@ public abstract class AssetSentimentDao {
             "(SELECT * FROM user_sentiments_table AS R " +
                 "WHERE L.asset_id = R.asset_id AND account_name = :accountName " +
                 "AND L.asset_type = R.asset_type)")
-    protected abstract List<AssetSentiment> getAssetsWithoutSentiment(AssetType assetType, String accountName);
+    protected abstract LiveData<List<AssetSentiment>> getAssetsWithoutSentiment(AssetType assetType,
+                                                                                String accountName);
+
+    /**
+     * Combines a list of AssetSentiments with a LiveData list of AssetSentiments. The result is
+     * stored in the given MediatorLiveData object. This function is used as the onChanged callback
+     * for the mediator, in order to combine two LiveData lists.
+     * @param mediator The MediatorLiveData where the merged list will be stored.
+     * @param values A list of AssetSentiments.
+     * @param other A LiveData object containing a list of AssetSentiments.
+     */
+    private static void combineLiveDataLists(MediatorLiveData<List<AssetSentiment>> mediator,
+                            List<AssetSentiment> values, LiveData<List<AssetSentiment>> other) {
+        if (other.getValue() != null) {
+            values.addAll(other.getValue());
+        }
+        mediator.setValue(values);
+    }
 
     /**
      * Inserts or replaces the user sentiment specified by the asset and account with the given

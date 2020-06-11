@@ -1,5 +1,6 @@
 package com.google.moviestvsentiments.service.account;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Query;
 import com.google.moviestvsentiments.model.Account;
@@ -23,13 +24,13 @@ public abstract class AccountDao {
      * Returns a list of all accounts in alphabetical order.
      */
     @Query("SELECT * FROM accounts_table ORDER BY account_name ASC")
-    public abstract List<Account> getAlphabetizedAccounts();
+    public abstract LiveData<List<Account>> getAlphabetizedAccounts();
 
     /**
      * Returns the currently signed-in account or null if all accounts are signed-out.
      */
     @Query("SELECT * FROM accounts_table WHERE is_current = 1")
-    public abstract Account getCurrentAccount();
+    public abstract LiveData<Account> getCurrentAccount();
 
     /**
      * Updates the given account record's is_current value.

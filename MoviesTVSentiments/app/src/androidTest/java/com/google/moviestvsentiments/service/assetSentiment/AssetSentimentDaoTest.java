@@ -12,6 +12,8 @@ import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
+import com.google.moviestvsentiments.service.liveData.LiveDataTestUtil;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -53,7 +55,8 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_withIncorrectId_returnsNull() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        AssetSentiment result = assetSentimentDao.getAsset("accountName", "incorrectId", AssetType.MOVIE);
+        AssetSentiment result = LiveDataTestUtil.getValue(assetSentimentDao.getAsset("accountName",
+                "incorrectId", AssetType.MOVIE));
 
         assertThat(result).isNull();
     }
@@ -61,7 +64,8 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_withIncorrectType_returnsNull() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.SHOW);
+        AssetSentiment result = LiveDataTestUtil.getValue(assetSentimentDao.getAsset("accountName",
+                "assetId", AssetType.SHOW));
 
         assertThat(result).isNull();
     }
@@ -69,7 +73,8 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_returnsAsset() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.MOVIE);
+        AssetSentiment result = LiveDataTestUtil.getValue(assetSentimentDao.getAsset("accountName",
+                "assetId", AssetType.MOVIE));
 
         assertThat(result.asset()).isEqualTo(MOVIE_ASSET);
     }
@@ -77,7 +82,8 @@ public class AssetSentimentDaoTest {
     @Test
     public void addAndGetAsset_withNoSentiment_returnsUnspecified() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
-        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.MOVIE);
+        AssetSentiment result = LiveDataTestUtil.getValue(assetSentimentDao.getAsset("accountName",
+                "assetId", AssetType.MOVIE));
 
         assertThat(result.sentimentType()).isEqualTo(SentimentType.UNSPECIFIED);
     }
@@ -88,7 +94,8 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
 
-        AssetSentiment result = assetSentimentDao.getAsset("accountName", "assetId", AssetType.MOVIE);
+        AssetSentiment result = LiveDataTestUtil.getValue(assetSentimentDao.getAsset("accountName",
+                "assetId", AssetType.MOVIE));
 
         assertThat(result).isEqualTo(AssetSentiment.create(MOVIE_ASSET, SentimentType.THUMBS_UP));
     }
@@ -99,8 +106,8 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.UNSPECIFIED);
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.SHOW, "accountName",
-                SentimentType.UNSPECIFIED);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.SHOW, "accountName", SentimentType.UNSPECIFIED));
 
         assertThat(results).isEmpty();
     }
@@ -111,8 +118,8 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "incorrectName",
-                SentimentType.THUMBS_UP);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.MOVIE, "incorrectName", SentimentType.THUMBS_UP));
 
         assertThat(results).isEmpty();
     }
@@ -123,8 +130,8 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
-                SentimentType.THUMBS_DOWN);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.MOVIE, "accountName", SentimentType.THUMBS_DOWN));
 
         assertThat(results).isEmpty();
     }
@@ -138,8 +145,8 @@ public class AssetSentimentDaoTest {
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         assetSentimentDao.updateSentiment("accountName", "assetId2",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
-                SentimentType.THUMBS_UP);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
 
         assertThat(results).containsExactly(
                 AssetSentiment.create(MOVIE_ASSET, SentimentType.THUMBS_UP),
@@ -153,8 +160,8 @@ public class AssetSentimentDaoTest {
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.UNSPECIFIED);
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
-                SentimentType.UNSPECIFIED);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.MOVIE, "accountName", SentimentType.UNSPECIFIED));
 
         assertThat(results).containsExactly(
                 AssetSentiment.create(MOVIE_ASSET, SentimentType.UNSPECIFIED),
@@ -168,8 +175,8 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         assetSentimentDao.deleteAllSentiments("accountName");
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
-                SentimentType.THUMBS_UP);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
 
         assertThat(results).isEmpty();
     }
@@ -181,8 +188,8 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.updateSentiment("accountName", "assetId",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         assetSentimentDao.deleteAllSentiments("otherName");
-        List<AssetSentiment> results = assetSentimentDao.getAssets(AssetType.MOVIE, "accountName",
-                SentimentType.THUMBS_UP);
+        List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
+                AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
 
         assertThat(results).containsExactly(AssetSentiment.create(MOVIE_ASSET, SentimentType.THUMBS_UP));
     }
