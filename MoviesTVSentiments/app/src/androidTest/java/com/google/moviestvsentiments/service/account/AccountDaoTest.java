@@ -9,7 +9,7 @@ import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
-import com.google.moviestvsentiments.service.liveData.LiveDataTestUtil;
+import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
