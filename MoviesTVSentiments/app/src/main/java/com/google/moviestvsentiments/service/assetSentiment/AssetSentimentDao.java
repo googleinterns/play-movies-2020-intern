@@ -25,10 +25,13 @@ public abstract class AssetSentimentDao {
 
     /**
      * Returns a LiveData view of the asset with the given id and type or null if the asset does not
-     * exist.
+     * exist. The asset is combined with the matching user sentiment and returned as an
+     * AssetSentiment object.
+     * @param accountName The name of the account to match with the sentiment.
      * @param assetId The id of the asset.
      * @param assetType The type of the asset.
-     * @return A LiveData object containing the asset matching the id and type.
+     * @return A LiveData object containing the AssetSentiment matching the account name, asset id
+     * and asset type.
      */
     @Query("SELECT L.*, sentiment_type AS sentimentType " +
             "FROM assets_table AS L " +
@@ -39,14 +42,14 @@ public abstract class AssetSentimentDao {
                                                       AssetType assetType);
 
     /**
-     * Returns a LiveData list of assets matching the given type that have been reacted to with the
-     * given sentiment by the given account. If the sentiment type is UNSPECIFIED, assets with no
-     * corresponding user sentiment record will also be returned.
+     * Returns a LiveData list of AssetSentiments matching the given type that have been reacted to
+     * with the given sentiment by the given account. If the sentiment type is UNSPECIFIED, assets
+     * with no corresponding user sentiment record will also be returned.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking assets for sentiments.
      * @param sentimentType The sentiment type to check for.
-     * @return A LiveData list of assets with reactions matching the given account name and
-     * sentiment type.
+     * @return A LiveData list of AssetSentiments with reactions matching the given account
+     * name and sentiment type.
      */
     public LiveData<List<AssetSentiment>> getAssets(AssetType assetType, String accountName,
                                                     SentimentType sentimentType) {
@@ -67,13 +70,13 @@ public abstract class AssetSentimentDao {
     }
 
     /**
-     * Returns a LiveData list of assets with reactions that match the given account name and
-     * sentiment type.
+     * Returns a LiveData list of AssetSentiments with reactions that match the given account name
+     * and sentiment type.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking assets for sentiments.
      * @param sentimentType The sentiment type to check for.
-     * @return A LiveData list of assets with reactions matching the given account name and
-     * sentiment type.
+     * @return A LiveData list of AssetSentiments with reactions matching the given asset type,
+     * account name and sentiment type.
      */
     @Query("SELECT *, :sentimentType AS sentimentType " +
             "FROM assets_table as L " +
@@ -89,7 +92,7 @@ public abstract class AssetSentimentDao {
      * therefore have no matching user sentiment record.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking for sentiments.
-     * @return A LiveData list of assets that have not been reacted to by the given account.
+     * @return A LiveData list of AssetSentiments that have not been reacted to by the given account.
      */
     @Query("SELECT *, NULL AS sentimentType " +
             "FROM assets_table AS L " +
