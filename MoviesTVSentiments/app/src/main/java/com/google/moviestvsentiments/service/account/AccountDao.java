@@ -21,13 +21,14 @@ public abstract class AccountDao {
     public abstract void addAccount(String name);
 
     /**
-     * Returns a list of all accounts in alphabetical order.
+     * Returns a LiveData list of all accounts in alphabetical order.
      */
     @Query("SELECT * FROM accounts_table ORDER BY account_name ASC")
     public abstract LiveData<List<Account>> getAlphabetizedAccounts();
 
     /**
-     * Returns the currently signed-in account or null if all accounts are signed-out.
+     * Returns a LiveData object containing the currently signed-in account or null if all accounts
+     * are signed-out.
      */
     @Query("SELECT * FROM accounts_table WHERE is_current = 1")
     public abstract LiveData<Account> getCurrentAccount();

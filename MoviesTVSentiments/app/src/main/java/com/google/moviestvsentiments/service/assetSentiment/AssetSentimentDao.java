@@ -2,7 +2,6 @@ package com.google.moviestvsentiments.service.assetSentiment;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -11,6 +10,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -24,10 +24,11 @@ public abstract class AssetSentimentDao {
     public abstract void addAsset(Asset asset);
 
     /**
-     * Returns the asset with the given id and type or null if it does not exist.
+     * Returns a LiveData view of the asset with the given id and type or null if the asset does not
+     * exist.
      * @param assetId The id of the asset.
      * @param assetType The type of the asset.
-     * @return The asset matching the id and type.
+     * @return A LiveData object containing the asset matching the id and type.
      */
     @Query("SELECT L.*, sentiment_type AS sentimentType " +
             "FROM assets_table AS L " +
@@ -38,13 +39,14 @@ public abstract class AssetSentimentDao {
                                                       AssetType assetType);
 
     /**
-     * Returns a list of assets matching the given type that have been reacted to with the given
-     * sentiment by the given account. If the sentiment type is UNSPECIFIED, assets with no
+     * Returns a LiveData list of assets matching the given type that have been reacted to with the
+     * given sentiment by the given account. If the sentiment type is UNSPECIFIED, assets with no
      * corresponding user sentiment record will also be returned.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking assets for sentiments.
      * @param sentimentType The sentiment type to check for.
-     * @return A list of assets with reactions matching the given account name and sentiment type.
+     * @return A LiveData list of assets with reactions matching the given account name and
+     * sentiment type.
      */
     public LiveData<List<AssetSentiment>> getAssets(AssetType assetType, String accountName,
                                                     SentimentType sentimentType) {
@@ -65,11 +67,13 @@ public abstract class AssetSentimentDao {
     }
 
     /**
-     * Returns a list of assets with reactions that match the given account name and sentiment type.
+     * Returns a LiveData list of assets with reactions that match the given account name and
+     * sentiment type.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking assets for sentiments.
      * @param sentimentType The sentiment type to check for.
-     * @return A list of assets with reactions matching the given account name and sentiment type.
+     * @return A LiveData list of assets with reactions matching the given account name and
+     * sentiment type.
      */
     @Query("SELECT *, :sentimentType AS sentimentType " +
             "FROM assets_table as L " +
@@ -81,11 +85,11 @@ public abstract class AssetSentimentDao {
                                                  String accountName, SentimentType sentimentType);
 
     /**
-     * Returns a list of assets that have not been reacted to by the given account name and
+     * Returns a LiveData list of assets that have not been reacted to by the given account name and
      * therefore have no matching user sentiment record.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking for sentiments.
-     * @return A list of assets that have not been reacted to by the given account.
+     * @return A LiveData list of assets that have not been reacted to by the given account.
      */
     @Query("SELECT *, NULL AS sentimentType " +
             "FROM assets_table AS L " +
@@ -106,10 +110,11 @@ public abstract class AssetSentimentDao {
      */
     private static void combineLiveDataLists(MediatorLiveData<List<AssetSentiment>> mediator,
                             List<AssetSentiment> values, LiveData<List<AssetSentiment>> other) {
+        ArrayList<AssetSentiment> result = new ArrayList<>(values);
         if (other.getValue() != null) {
-            values.addAll(other.getValue());
+            result.addAll(other.getValue());
         }
-        mediator.setValue(values);
+        mediator.setValue(result);
     }
 
     /**
