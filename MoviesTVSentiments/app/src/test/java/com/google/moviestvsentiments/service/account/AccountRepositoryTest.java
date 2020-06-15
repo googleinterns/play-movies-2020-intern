@@ -50,12 +50,12 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void getAllAccounts_returnsAccounts() {
+    public void getAlphabetizedAccounts_returnsAccounts() {
         MutableLiveData<List<Account>> accountsData = new MutableLiveData<>();
         accountsData.setValue(Arrays.asList(ACCOUNT));
         when(dao.getAlphabetizedAccounts()).thenReturn(accountsData);
 
-        List<Account> results = LiveDataTestUtil.getValue(repository.getAllAccounts());
+        List<Account> results = LiveDataTestUtil.getValue(repository.getAlphabetizedAccounts());
 
         assertThat(results).containsExactly(ACCOUNT);
     }

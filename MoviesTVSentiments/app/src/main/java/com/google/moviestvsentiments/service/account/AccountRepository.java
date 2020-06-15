@@ -36,7 +36,7 @@ public class AccountRepository {
     /**
      * Returns a LiveData list of all accounts sorted by name in alphabetical order.
      */
-    LiveData<List<Account>> getAllAccounts() {
+    LiveData<List<Account>> getAlphabetizedAccounts() {
         return accountDao.getAlphabetizedAccounts();
     }
 
