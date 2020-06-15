@@ -1,4 +1,4 @@
-package com.google.moviestvsentiments.service.liveData;
+package com.google.moviestvsentiments.util;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
