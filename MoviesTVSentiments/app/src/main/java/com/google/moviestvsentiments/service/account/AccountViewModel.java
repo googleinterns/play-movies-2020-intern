@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import com.google.moviestvsentiments.model.Account;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * A ViewModel that handles fetching and updating accounts.
@@ -12,7 +13,8 @@ public class AccountViewModel extends ViewModel {
 
     private AccountRepository repository;
 
-    private AccountViewModel(AccountRepository repository) {
+    @Inject
+    AccountViewModel(AccountRepository repository) {
         this.repository = repository;
     }
 

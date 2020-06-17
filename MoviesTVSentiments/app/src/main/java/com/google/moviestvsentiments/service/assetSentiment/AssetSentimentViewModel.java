@@ -7,6 +7,7 @@ import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * A ViewModel that handles fetching and updating assets and user sentiments.
@@ -15,7 +16,8 @@ public class AssetSentimentViewModel extends ViewModel {
 
     private final AssetSentimentRepository repository;
 
-    private AssetSentimentViewModel(AssetSentimentRepository repository) {
+    @Inject
+    AssetSentimentViewModel(AssetSentimentRepository repository) {
         this.repository = repository;
     }
 
