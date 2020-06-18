@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.service.account;
 import androidx.lifecycle.LiveData;
 import com.google.moviestvsentiments.model.Account;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * A repository that handles fetching and updating accounts.
@@ -11,7 +12,8 @@ public class AccountRepository {
 
     private final AccountDao accountDao;
 
-    private AccountRepository(AccountDao accountDao) {
+    @Inject
+    AccountRepository(AccountDao accountDao) {
         this.accountDao = accountDao;
     }
 

@@ -6,6 +6,7 @@ import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * A repository that handles fetching and updating assets and their user sentiments.
@@ -14,7 +15,8 @@ public class AssetSentimentRepository {
 
     private final AssetSentimentDao assetSentimentDao;
 
-    private AssetSentimentRepository(AssetSentimentDao assetSentimentDao) {
+    @Inject
+    AssetSentimentRepository(AssetSentimentDao assetSentimentDao) {
         this.assetSentimentDao = assetSentimentDao;
     }
 
