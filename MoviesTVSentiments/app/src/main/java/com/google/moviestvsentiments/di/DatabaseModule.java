@@ -4,6 +4,8 @@ import android.content.Context;
 import androidx.room.Room;
 import com.google.moviestvsentiments.service.account.AccountDao;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentDao;
+import com.google.moviestvsentiments.service.database.AsyncDatabaseExecutor;
+import com.google.moviestvsentiments.service.database.DatabaseExecutor;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
 import javax.inject.Singleton;
 import dagger.Module;
@@ -18,6 +20,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext;
 @InstallIn(ApplicationComponent.class)
 @Module
 public class DatabaseModule {
+
+    private static final int NUMBER_OF_THREADS = 4;
 
     /**
      * Returns the singleton SentimentsDatabase.
@@ -49,5 +53,14 @@ public class DatabaseModule {
     @Provides
     public AssetSentimentDao provideAssetSentimentDao(SentimentsDatabase database) {
         return database.assetSentimentDao();
+    }
+
+    /**
+     * Returns the singleton DatabaseExecutor.
+     */
+    @Provides
+    @Singleton
+    public DatabaseExecutor provideDatabaseExecutor() {
+        return AsyncDatabaseExecutor.create(NUMBER_OF_THREADS);
     }
 }

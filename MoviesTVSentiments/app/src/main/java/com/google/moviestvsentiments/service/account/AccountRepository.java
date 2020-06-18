@@ -2,6 +2,7 @@ package com.google.moviestvsentiments.service.account;
 
 import androidx.lifecycle.LiveData;
 import com.google.moviestvsentiments.model.Account;
+import com.google.moviestvsentiments.service.database.DatabaseExecutor;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -11,19 +12,22 @@ import javax.inject.Inject;
 public class AccountRepository {
 
     private final AccountDao accountDao;
+    private final DatabaseExecutor executor;
 
     @Inject
-    AccountRepository(AccountDao accountDao) {
+    AccountRepository(AccountDao accountDao, DatabaseExecutor executor) {
         this.accountDao = accountDao;
+        this.executor = executor;
     }
 
     /**
      * Returns a new AccountRepository object.
      * @param accountDao The Dao object to use when accessing the local database.
+     * @param executor The DatabaseExecutor to use when writing to the database.
      * @return A new AccountRepository object.
      */
-    public static AccountRepository create(AccountDao accountDao) {
-        return new AccountRepository(accountDao);
+    public static AccountRepository create(AccountDao accountDao, DatabaseExecutor executor) {
+        return new AccountRepository(accountDao, executor);
     }
 
     /**
@@ -32,7 +36,9 @@ public class AccountRepository {
      * @param name The name of the account to add.
      */
     void addAccount(String name) {
-        accountDao.addAccount(name);
+        executor.execute(() -> {
+            accountDao.addAccount(name);
+        });
     }
 
     /**
@@ -54,9 +60,10 @@ public class AccountRepository {
      * Updates the given account record's is_current value.
      * @param name The name of the account to update.
      * @param isCurrent The value to set is_current to.
-     * @return True if the record exists and was updated successfully.
      */
-    boolean setIsCurrent(String name, boolean isCurrent) {
-        return accountDao.setIsCurrent(name, isCurrent);
+    void setIsCurrent(String name, boolean isCurrent) {
+        executor.execute(() -> {
+            accountDao.setIsCurrent(name, isCurrent);
+        });
     }
 }

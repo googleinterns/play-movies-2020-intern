@@ -5,6 +5,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.service.database.DatabaseExecutor;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -14,19 +15,23 @@ import javax.inject.Inject;
 public class AssetSentimentRepository {
 
     private final AssetSentimentDao assetSentimentDao;
+    private final DatabaseExecutor executor;
 
     @Inject
-    AssetSentimentRepository(AssetSentimentDao assetSentimentDao) {
+    AssetSentimentRepository(AssetSentimentDao assetSentimentDao, DatabaseExecutor executor) {
         this.assetSentimentDao = assetSentimentDao;
+        this.executor = executor;
     }
 
     /**
      * Returns a new AssetSentimentRepository.
      * @param assetSentimentDao The Dao object to use when accessing the local database.
+     * @param executor The DatabaseExecutor to use when writing to the database.
      * @return A new AssetSentimentRepository object.
      */
-    public static AssetSentimentRepository create(AssetSentimentDao assetSentimentDao) {
-        return new AssetSentimentRepository(assetSentimentDao);
+    public static AssetSentimentRepository create(AssetSentimentDao assetSentimentDao,
+                                                  DatabaseExecutor executor) {
+        return new AssetSentimentRepository(assetSentimentDao, executor);
     }
 
     /**
@@ -34,7 +39,9 @@ public class AssetSentimentRepository {
      * @param asset The asset to insert.
      */
     void addAsset(Asset asset) {
-        assetSentimentDao.addAsset(asset);
+        executor.execute(() -> {
+            assetSentimentDao.addAsset(asset);
+        });
     }
 
     /**
@@ -76,7 +83,9 @@ public class AssetSentimentRepository {
      */
     void updateSentiment(String accountName, String assetId, AssetType assetType,
                          SentimentType sentimentType) {
-        assetSentimentDao.updateSentiment(accountName, assetId, assetType, sentimentType);
+        executor.execute(() -> {
+            assetSentimentDao.updateSentiment(accountName, assetId, assetType, sentimentType);
+        });
     }
 
     /**
@@ -84,6 +93,8 @@ public class AssetSentimentRepository {
      * @param accountName The account to delete all sentiments for.
      */
     void deleteAllSentiments(String accountName) {
-        assetSentimentDao.deleteAllSentiments(accountName);
+        executor.execute(() -> {
+            assetSentimentDao.deleteAllSentiments(accountName);
+        });
     }
 }
