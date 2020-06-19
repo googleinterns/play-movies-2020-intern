@@ -5,8 +5,8 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
-import com.google.moviestvsentiments.service.database.DatabaseExecutor;
 import java.util.List;
+import java.util.concurrent.Executor;
 import javax.inject.Inject;
 
 /**
@@ -15,10 +15,10 @@ import javax.inject.Inject;
 public class AssetSentimentRepository {
 
     private final AssetSentimentDao assetSentimentDao;
-    private final DatabaseExecutor executor;
+    private final Executor executor;
 
     @Inject
-    AssetSentimentRepository(AssetSentimentDao assetSentimentDao, DatabaseExecutor executor) {
+    AssetSentimentRepository(AssetSentimentDao assetSentimentDao, Executor executor) {
         this.assetSentimentDao = assetSentimentDao;
         this.executor = executor;
     }
@@ -26,11 +26,11 @@ public class AssetSentimentRepository {
     /**
      * Returns a new AssetSentimentRepository.
      * @param assetSentimentDao The Dao object to use when accessing the local database.
-     * @param executor The DatabaseExecutor to use when writing to the database.
+     * @param executor The Executor to use when writing to the database.
      * @return A new AssetSentimentRepository object.
      */
     public static AssetSentimentRepository create(AssetSentimentDao assetSentimentDao,
-                                                  DatabaseExecutor executor) {
+                                                  Executor executor) {
         return new AssetSentimentRepository(assetSentimentDao, executor);
     }
 

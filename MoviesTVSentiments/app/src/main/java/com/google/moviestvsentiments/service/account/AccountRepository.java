@@ -2,8 +2,8 @@ package com.google.moviestvsentiments.service.account;
 
 import androidx.lifecycle.LiveData;
 import com.google.moviestvsentiments.model.Account;
-import com.google.moviestvsentiments.service.database.DatabaseExecutor;
 import java.util.List;
+import java.util.concurrent.Executor;
 import javax.inject.Inject;
 
 /**
@@ -12,10 +12,10 @@ import javax.inject.Inject;
 public class AccountRepository {
 
     private final AccountDao accountDao;
-    private final DatabaseExecutor executor;
+    private final Executor executor;
 
     @Inject
-    AccountRepository(AccountDao accountDao, DatabaseExecutor executor) {
+    AccountRepository(AccountDao accountDao, Executor executor) {
         this.accountDao = accountDao;
         this.executor = executor;
     }
@@ -23,10 +23,10 @@ public class AccountRepository {
     /**
      * Returns a new AccountRepository object.
      * @param accountDao The Dao object to use when accessing the local database.
-     * @param executor The DatabaseExecutor to use when writing to the database.
+     * @param executor The Executor to use when writing to the database.
      * @return A new AccountRepository object.
      */
-    public static AccountRepository create(AccountDao accountDao, DatabaseExecutor executor) {
+    public static AccountRepository create(AccountDao accountDao, Executor executor) {
         return new AccountRepository(accountDao, executor);
     }
 

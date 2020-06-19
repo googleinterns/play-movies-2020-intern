@@ -1,11 +1,11 @@
 package com.google.moviestvsentiments.service;
 
-import com.google.moviestvsentiments.service.database.DatabaseExecutor;
+import java.util.concurrent.Executor;
 
 /**
- * A DatabaseExecutor that executes all queries on the main thread for use in unit tests.
+ * An Executor that executes all queries on the main thread for use in unit tests.
  */
-public class MainThreadDatabaseExecutor implements DatabaseExecutor {
+public class MainThreadDatabaseExecutor implements Executor {
 
     /**
      * Runs the given Room database queries on the main thread.
