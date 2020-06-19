@@ -4,7 +4,9 @@ import android.content.Context;
 import androidx.room.Room;
 import com.google.moviestvsentiments.service.account.AccountDao;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentDao;
+import com.google.moviestvsentiments.service.database.AsyncDatabaseExecutor;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
+import java.util.concurrent.Executor;
 import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
@@ -49,5 +51,14 @@ public class DatabaseModule {
     @Provides
     public AssetSentimentDao provideAssetSentimentDao(SentimentsDatabase database) {
         return database.assetSentimentDao();
+    }
+
+    /**
+     * Returns the singleton database Executor.
+     */
+    @Provides
+    @Singleton
+    public Executor provideDatabaseExecutor() {
+        return AsyncDatabaseExecutor.create();
     }
 }

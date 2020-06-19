@@ -11,6 +11,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.service.MainThreadDatabaseExecutor;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +37,7 @@ public class AssetSentimentRepositoryTest {
     @Before
     public void setUp() {
         dao = mock(AssetSentimentDao.class);
-        repository = AssetSentimentRepository.create(dao);
+        repository = AssetSentimentRepository.create(dao, new MainThreadDatabaseExecutor());
     }
 
     @Test

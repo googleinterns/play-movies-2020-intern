@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 import com.google.moviestvsentiments.model.Account;
+import com.google.moviestvsentiments.service.MainThreadDatabaseExecutor;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +40,7 @@ public class AccountRepositoryTest {
     @Before
     public void setUp() {
         dao = mock(AccountDao.class);
-        repository = AccountRepository.create(dao);
+        repository = AccountRepository.create(dao, new MainThreadDatabaseExecutor());
     }
 
     @Test

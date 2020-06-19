@@ -55,9 +55,8 @@ public class AccountViewModel extends ViewModel {
      * Updates the given account record's is_current value.
      * @param name The name of the account to update.
      * @param isCurrent The value to set is_current to.
-     * @return True if the record exists and was updated successfully.
      */
-    public boolean setIsCurrent(String name, boolean isCurrent) {
-        return repository.setIsCurrent(name, isCurrent);
+    public void setIsCurrent(String name, boolean isCurrent) {
+        repository.setIsCurrent(name, isCurrent);
     }
 }
