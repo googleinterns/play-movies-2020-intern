@@ -61,4 +61,21 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
             startActivityForResult(intent, ADD_ACCOUNT_REQUEST_CODE);
         }
     }
+
+    /**
+     * Adds the account name returned by the AddAccountActivity to the Room database. If the
+     * result code is not RESULT_OK, then no change is made to the database.
+     * @param requestCode The request code used to start the AddAccountActivity.
+     * @param resultCode The result code returned by the AddAccountActivity.
+     * @param data The intent returned by the AddAccountActivity.
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_ACCOUNT_REQUEST_CODE && resultCode == RESULT_OK) {
+            String accountName = data.getStringExtra(AddAccountActivity.EXTRA_ACCOUNT_NAME);
+            viewModel.addAccount(accountName);
+        }
+    }
 }
