@@ -1,5 +1,7 @@
 package com.google.moviestvsentiments.service.database;
 
+import android.os.Process;
+
 import static android.os.Process.THREAD_PRIORITY_BACKGROUND;
 
 import java.util.concurrent.Executor;
@@ -21,8 +23,13 @@ public class AsyncDatabaseExecutor implements Executor {
         executor = Executors.newCachedThreadPool(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r);
-                thread.setPriority(THREAD_PRIORITY_BACKGROUND);
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Process.setThreadPriority(THREAD_PRIORITY_BACKGROUND);
+                        r.run();
+                    }
+                });
                 return thread;
             }
         });
