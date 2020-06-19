@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Movies &amp; TV Sentiments</string>
+    <string name="addAccountHint">Account Name</string>
+    <string name="addAccountSave">Add Account</string>
 </resources>
