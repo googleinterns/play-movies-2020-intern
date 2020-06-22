@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.google.moviestvsentiments.usecase.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_liked"
+        android:name="com.google.moviestvsentiments.usecase.liked.LikedFragment"
+        android:label="@string/title_liked"
+        tools:layout="@layout/fragment_liked" />
+
+    <fragment
+        android:id="@+id/navigation_disliked"
+        android:name="com.google.moviestvsentiments.usecase.disliked.DislikedFragment"
+        android:label="@string/title_disliked"
+        tools:layout="@layout/fragment_disliked" />
+</navigation>
