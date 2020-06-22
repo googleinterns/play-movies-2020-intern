@@ -2,4 +2,7 @@
     <string name="app_name">Movies &amp; TV Sentiments</string>
     <string name="addAccountHint">Account Name</string>
     <string name="addAccountSave">Add Account</string>
+    <string name="title_home">Home</string>
+    <string name="title_liked">Liked</string>
+    <string name="title_disliked">Disliked</string>
 </resources>
