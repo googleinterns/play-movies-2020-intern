@@ -10,6 +10,7 @@ import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.service.account.AccountViewModel;
 import com.google.moviestvsentiments.usecase.addAccount.AddAccountActivity;
+import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActivity;
 import dagger.hilt.android.AndroidEntryPoint;
 import java.util.List;
 import javax.inject.Inject;
@@ -21,6 +22,8 @@ import javax.inject.Inject;
 @AndroidEntryPoint
 public class SigninActivity extends AppCompatActivity implements AccountListAdapter.AccountClickListener {
 
+    public static final String EXTRA_ACCOUNT_NAME = "com.google.moviestvsentiments.ACCOUNT_NAME";
+
     private static final int ADD_ACCOUNT_REQUEST_CODE = 1;
 
     @Inject
@@ -30,6 +33,15 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
+
+        viewModel.getCurrentAccount().observe(this, account -> {
+            if (account != null) {
+                Intent intent = new Intent(this, SentimentsNavigationActivity.class);
+                intent.putExtra(EXTRA_ACCOUNT_NAME, account.name);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         RecyclerView accountList = findViewById(R.id.accountList);
         accountList.setHasFixedSize(true);
