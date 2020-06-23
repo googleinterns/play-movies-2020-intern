@@ -5,4 +5,6 @@
     <string name="title_home">Home</string>
     <string name="title_liked">Liked</string>
     <string name="title_disliked">Disliked</string>
+    <string name="movies_label">Movies</string>
+    <string name="tvshows_label">TV Shows</string>
 </resources>
