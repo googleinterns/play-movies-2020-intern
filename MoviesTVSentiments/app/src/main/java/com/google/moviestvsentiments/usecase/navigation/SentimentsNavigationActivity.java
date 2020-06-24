@@ -8,10 +8,12 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * An activity that manages switching between the Home, Liked and Disliked tabs.
  */
+@AndroidEntryPoint
 public class SentimentsNavigationActivity extends AppCompatActivity {
 
     @Override
