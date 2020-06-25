@@ -27,6 +27,8 @@ import com.google.moviestvsentiments.util.AssetUtil;
 @HiltAndroidTest
 public class HomeFragmentTest {
 
+    private static final int RECYCLER_VIEW_TIMEOUT = 1500;
+
     @Rule
     public HiltAndroidRule hiltAndroidRule = new HiltAndroidRule(this);
 
@@ -58,7 +60,7 @@ public class HomeFragmentTest {
 
         HiltFragmentScenario.launchHiltFragment(HomeFragment.class);
 
-        onView(withId(R.id.movies_list)).check(withItemCount(1));
+        onView(withId(R.id.movies_list)).check(withItemCount(1).withTimeout(RECYCLER_VIEW_TIMEOUT));
     }
 
     @Test
@@ -71,7 +73,7 @@ public class HomeFragmentTest {
 
         HiltFragmentScenario.launchHiltFragmentWithIntent(HomeFragment.class, intent);
 
-        onView(withId(R.id.movies_list)).check(withItemCount(1));
+        onView(withId(R.id.movies_list)).check(withItemCount(1).withTimeout(RECYCLER_VIEW_TIMEOUT));
     }
 
     @Test
