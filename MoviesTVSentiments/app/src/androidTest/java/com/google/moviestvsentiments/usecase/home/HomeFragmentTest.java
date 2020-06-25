@@ -9,7 +9,6 @@ import androidx.test.core.app.ApplicationProvider;
 import com.google.moviestvsentiments.HiltTestActivity;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
-import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
@@ -22,16 +21,11 @@ import dagger.hilt.android.testing.HiltAndroidTest;
 import dagger.hilt.android.testing.UninstallModules;
 import com.google.moviestvsentiments.HiltFragmentScenario;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
+import com.google.moviestvsentiments.util.AssetUtil;
 
 @UninstallModules(DatabaseModule.class)
 @HiltAndroidTest
 public class HomeFragmentTest {
-
-    private static Asset createMovieAsset(String assetId) {
-        return Asset.builder().setId(assetId).setType(AssetType.MOVIE).setTitle("assetTitle")
-                .setPoster("posterURL").setBanner("bannerURL").setPlot("plotDescription")
-                .setRuntime("runtime").setYear("year").setTimestamp(1).build();
-    }
 
     @Rule
     public HiltAndroidRule hiltAndroidRule = new HiltAndroidRule(this);
@@ -60,7 +54,7 @@ public class HomeFragmentTest {
 
     @Test
     public void homeFragment_displaysAssetsWithNoReaction() {
-        database.assetSentimentDao().addAsset(createMovieAsset("assetId1"));
+        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId1"));
 
         HiltFragmentScenario.launchHiltFragment(HomeFragment.class);
 
@@ -69,7 +63,7 @@ public class HomeFragmentTest {
 
     @Test
     public void homeFragment_displaysAssetsWithUnspecifiedReaction() {
-        database.assetSentimentDao().addAsset(createMovieAsset("assetId1"));
+        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId1"));
         database.assetSentimentDao().updateSentiment("Test Account", "assetId1",
                 AssetType.MOVIE, SentimentType.UNSPECIFIED);
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
@@ -82,8 +76,8 @@ public class HomeFragmentTest {
 
     @Test
     public void homeFragment_ignoresAssetsWithReaction() {
-        database.assetSentimentDao().addAsset(createMovieAsset("assetId1"));
-        database.assetSentimentDao().addAsset(createMovieAsset("assetId2"));
+        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId1"));
+        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId2"));
         database.assetSentimentDao().updateSentiment("Test Account", "assetId1",
                 AssetType.MOVIE, SentimentType.THUMBS_UP);
         database.assetSentimentDao().updateSentiment("Test Account", "assetId2",

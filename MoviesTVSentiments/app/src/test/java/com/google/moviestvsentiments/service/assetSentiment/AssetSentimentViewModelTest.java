@@ -11,6 +11,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.util.AssetUtil;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.Before;
 import org.junit.Rule;
@@ -23,9 +24,7 @@ import java.util.List;
 @RunWith(JUnit4.class)
 public class AssetSentimentViewModelTest {
 
-    private static final Asset ASSET = Asset.builder().setId("assetId").setType(AssetType.SHOW)
-            .setTitle("assetTitle").setPoster("posterURL").setBanner("bannerURL").setYear("year")
-            .setPlot("plotDescription").setRuntime("runtime").setTimestamp(1).build();
+    private static final Asset ASSET = AssetUtil.createShowAsset("assetId");
 
     @Rule
     public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();

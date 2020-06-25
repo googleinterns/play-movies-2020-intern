@@ -12,6 +12,7 @@ import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
+import com.google.moviestvsentiments.util.AssetUtil;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -23,14 +24,8 @@ import java.util.List;
 @RunWith(AndroidJUnit4.class)
 public class AssetSentimentDaoTest {
 
-    private static final Asset MOVIE_ASSET = createMovieAsset("assetId");
-    private static final Asset MOVIE_ASSET_2 = createMovieAsset("assetId2");
-
-    private static Asset createMovieAsset(String assetId) {
-        return Asset.builder().setId(assetId).setType(AssetType.MOVIE).setTitle("assetTitle")
-                .setPoster("posterURL").setBanner("bannerURL").setPlot("plotDescription")
-                .setRuntime("runtime").setYear("year").setTimestamp(1).build();
-    }
+    private static final Asset MOVIE_ASSET = AssetUtil.createMovieAsset("assetId");
+    private static final Asset MOVIE_ASSET_2 = AssetUtil.createMovieAsset("assetId2");
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
