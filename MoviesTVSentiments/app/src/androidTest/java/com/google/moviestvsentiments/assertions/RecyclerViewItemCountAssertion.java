@@ -13,9 +13,11 @@ import androidx.test.espresso.ViewAssertion;
 public class RecyclerViewItemCountAssertion implements ViewAssertion {
 
     private final int expectedCount;
+    private int timeout;
 
     private RecyclerViewItemCountAssertion(int expectedCount) {
         this.expectedCount = expectedCount;
+        timeout = 0;
     }
 
     /**
@@ -27,6 +29,17 @@ public class RecyclerViewItemCountAssertion implements ViewAssertion {
         return new RecyclerViewItemCountAssertion(expectedCount);
     }
 
+    /**
+     * Sets the timeout of this RecyclerViewItemCountAssertion to the provided value and returns
+     * the RecyclerViewItemCountAssertion for further method chaining.
+     * @param millis The timeout in milliseconds.
+     * @return The invoked RecyclerViewItemCountAssertion
+     */
+    public RecyclerViewItemCountAssertion withTimeout(int millis) {
+        timeout = millis;
+        return this;
+    }
+
     @Override
     public void check(View view, NoMatchingViewException noViewFoundException) {
         if (noViewFoundException != null) {
@@ -34,6 +47,16 @@ public class RecyclerViewItemCountAssertion implements ViewAssertion {
         }
         RecyclerView recyclerView = (RecyclerView) view;
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
+
+        int timePolled = 0;
+        while (timePolled < timeout && adapter.getItemCount() != expectedCount) {
+            try {
+                Thread.sleep(10);
+                timePolled += 10;
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
         assertThat(adapter.getItemCount()).isEqualTo(expectedCount);
     }
 }
