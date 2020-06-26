@@ -27,7 +27,7 @@ import com.google.moviestvsentiments.util.AssetUtil;
 @HiltAndroidTest
 public class HomeFragmentTest {
 
-    private static final int RECYCLER_VIEW_TIMEOUT = 1500;
+    private static final int RECYCLER_VIEW_TIMEOUT = 26000;
 
     @Rule
     public HiltAndroidRule hiltAndroidRule = new HiltAndroidRule(this);

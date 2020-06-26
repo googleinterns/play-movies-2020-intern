@@ -31,7 +31,7 @@ import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActi
 @HiltAndroidTest
 public class SigninActivityTest {
 
-    private static final int RECYCLER_VIEW_TIMEOUT = 1500;
+    private static final int RECYCLER_VIEW_TIMEOUT = 26000;
 
     @Rule
     public RuleChain rule = RuleChain.outerRule(new HiltAndroidRule(this))

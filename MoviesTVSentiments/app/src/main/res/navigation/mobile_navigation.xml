@@ -9,13 +9,13 @@
         android:id="@+id/navigation_home"
         android:name="com.google.moviestvsentiments.usecase.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/asset_lists_screen" />
 
     <fragment
         android:id="@+id/navigation_liked"
         android:name="com.google.moviestvsentiments.usecase.liked.LikedFragment"
         android:label="@string/title_liked"
-        tools:layout="@layout/fragment_liked" />
+        tools:layout="@layout/asset_lists_screen" />
 
     <fragment
         android:id="@+id/navigation_disliked"
