@@ -1,4 +1,4 @@
-package com.google.moviestvsentiments.usecase.component;
+package com.google.moviestvsentiments.usecase.assetList;
 
 import android.view.LayoutInflater;
 import android.view.View;

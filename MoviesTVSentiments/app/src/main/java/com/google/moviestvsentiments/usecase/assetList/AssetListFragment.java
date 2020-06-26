@@ -1,4 +1,4 @@
-package com.google.moviestvsentiments.usecase.liked;
+package com.google.moviestvsentiments.usecase.assetList;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,16 +10,16 @@ import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentViewModel;
-import com.google.moviestvsentiments.usecase.component.AssetListScreen;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
 
 /**
- * A fragment that displays the list of liked assets.
+ * A fragment that displays a list of assets matching the sentiment type passed in the fragment's
+ * arguments.
  */
 @AndroidEntryPoint
-public class LikedFragment extends Fragment {
+public class AssetListFragment extends Fragment {
 
     @Inject
     AssetSentimentViewModel viewModel;
@@ -31,9 +31,11 @@ public class LikedFragment extends Fragment {
         AssetListScreen assetListScreen = AssetListScreen.create(root, container.getContext());
 
         String accountName = getActivity().getIntent().getStringExtra(SigninActivity.EXTRA_ACCOUNT_NAME);
-        viewModel.getAssets(AssetType.MOVIE, accountName, SentimentType.THUMBS_UP)
+        SentimentType sentimentType = AssetListFragmentArgs.fromBundle(getArguments())
+                .getSentimentType();
+        viewModel.getAssets(AssetType.MOVIE, accountName, sentimentType)
                 .observe(getViewLifecycleOwner(), movies -> assetListScreen.setMovies(movies));
-        viewModel.getAssets(AssetType.SHOW, accountName, SentimentType.THUMBS_UP)
+        viewModel.getAssets(AssetType.SHOW, accountName, sentimentType)
                 .observe(getViewLifecycleOwner(), shows -> assetListScreen.setShows(shows));
 
         return root;
