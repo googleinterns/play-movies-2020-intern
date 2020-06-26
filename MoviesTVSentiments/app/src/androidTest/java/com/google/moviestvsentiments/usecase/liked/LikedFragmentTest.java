@@ -5,6 +5,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAssertion.withItemCount;
 
 import android.content.Intent;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.core.app.ApplicationProvider;
 import com.google.moviestvsentiments.HiltFragmentScenario;
 import com.google.moviestvsentiments.HiltTestActivity;
@@ -27,10 +28,11 @@ import dagger.hilt.android.testing.UninstallModules;
 @HiltAndroidTest
 public class LikedFragmentTest {
 
-    private static final int RECYCLER_VIEW_TIMEOUT = 26000;
-
     @Rule
     public HiltAndroidRule hiltAndroidRule = new HiltAndroidRule(this);
+
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
 
     @Inject
     SentimentsDatabase database;
@@ -64,7 +66,7 @@ public class LikedFragmentTest {
 
         HiltFragmentScenario.launchHiltFragmentWithIntent(LikedFragment.class, intent);
 
-        onView(withId(R.id.movies_list)).check(withItemCount(1).withTimeout(RECYCLER_VIEW_TIMEOUT));
+        onView(withId(R.id.movies_list)).check(withItemCount(1));
     }
 
     @Test
@@ -77,7 +79,7 @@ public class LikedFragmentTest {
 
         HiltFragmentScenario.launchHiltFragmentWithIntent(LikedFragment.class, intent);
 
-        onView(withId(R.id.tvshows_list)).check(withItemCount(1).withTimeout(RECYCLER_VIEW_TIMEOUT));
+        onView(withId(R.id.tvshows_list)).check(withItemCount(1));
     }
 
     @Test

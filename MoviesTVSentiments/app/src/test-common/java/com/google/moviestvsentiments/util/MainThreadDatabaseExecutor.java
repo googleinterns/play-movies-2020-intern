@@ -1,4 +1,4 @@
-package com.google.moviestvsentiments.service;
+package com.google.moviestvsentiments.util;
 
 import java.util.concurrent.Executor;
 
