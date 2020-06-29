@@ -4,8 +4,8 @@ import android.content.Context;
 import androidx.room.Room;
 import com.google.moviestvsentiments.service.account.AccountDao;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentDao;
-import com.google.moviestvsentiments.service.database.AsyncDatabaseExecutor;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
+import com.google.moviestvsentiments.util.MainThreadDatabaseExecutor;
 import java.util.concurrent.Executor;
 import javax.inject.Singleton;
 import dagger.Module;
@@ -29,7 +29,8 @@ public class InMemoryDatabaseModule {
     @Provides
     @Singleton
     public SentimentsDatabase provideSentimentsDatabase(@ApplicationContext Context context) {
-        return Room.inMemoryDatabaseBuilder(context, SentimentsDatabase.class).build();
+        return Room.inMemoryDatabaseBuilder(context, SentimentsDatabase.class)
+                .allowMainThreadQueries().build();
     }
 
     /**
@@ -58,6 +59,6 @@ public class InMemoryDatabaseModule {
     @Provides
     @Singleton
     public Executor provideDatabaseExecutor() {
-        return AsyncDatabaseExecutor.create();
+        return new MainThreadDatabaseExecutor();
     }
 }

@@ -21,6 +21,7 @@ import org.junit.rules.RuleChain;
 import dagger.hilt.android.testing.HiltAndroidRule;
 import dagger.hilt.android.testing.HiltAndroidTest;
 import dagger.hilt.android.testing.UninstallModules;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
@@ -31,15 +32,16 @@ import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActi
 @HiltAndroidTest
 public class SigninActivityTest {
 
-    private static final int RECYCLER_VIEW_TIMEOUT = 1500;
-
     @Rule
     public RuleChain rule = RuleChain.outerRule(new HiltAndroidRule(this))
             .around(new IntentsTestRule<>(SigninActivity.class));
 
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
     @Test
     public void signinActivity_displaysOnlyAddAccount() {
-        onView(withId(R.id.accountList)).check(withItemCount(1).withTimeout(RECYCLER_VIEW_TIMEOUT));
+        onView(withId(R.id.accountList)).check(withItemCount(1));
         onView(withId(R.id.accountTextView)).check(matches(withText("Add Account")));
     }
 
@@ -57,7 +59,7 @@ public class SigninActivityTest {
 
         onView(withId(R.id.accountTextView)).perform(click());
 
-        onView(withId(R.id.accountList)).check(withItemCount(1).withTimeout(RECYCLER_VIEW_TIMEOUT));
+        onView(withId(R.id.accountList)).check(withItemCount(1));
         onView(withId(R.id.accountTextView)).check(matches(withText("Add Account")));
     }
 
@@ -70,7 +72,7 @@ public class SigninActivityTest {
 
         onView(withId(R.id.accountTextView)).perform(click());
 
-        onView(withId(R.id.accountList)).check(withItemCount(2).withTimeout(RECYCLER_VIEW_TIMEOUT));
+        onView(withId(R.id.accountList)).check(withItemCount(2));
     }
 
     @Test

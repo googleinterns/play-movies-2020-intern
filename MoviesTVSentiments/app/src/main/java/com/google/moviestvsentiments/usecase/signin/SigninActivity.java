@@ -49,11 +49,8 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
         accountList.setAdapter(adapter);
         accountList.setLayoutManager(new LinearLayoutManager(this));
 
-        viewModel.getAlphabetizedAccounts().observe(this, new Observer<List<Account>>() {
-            @Override
-            public void onChanged(List<Account> accounts) {
-                adapter.setAccounts(accounts);
-            }
+        viewModel.getAlphabetizedAccounts().observe(this, accounts -> {
+            adapter.setAccounts(accounts);
         });
     }
 
