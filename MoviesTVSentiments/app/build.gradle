@@ -31,7 +31,7 @@ android {
     sourceSets {
         main {
             res {
-                srcDirs 'src/main/res', 'src/main/res/layouts/signin', 'src/main/res/layouts/addAccount', 'src/main/res/layouts/disliked', 'src/main/res/layouts/liked', 'src/main/res/layouts/home', 'src/main/res/layouts/navigation', 'src/main/res/layouts/assetList'
+                srcDirs 'src/main/res', 'src/main/res/layouts/signin', 'src/main/res/layouts/addAccount', 'src/main/res/layouts/disliked', 'src/main/res/layouts/liked', 'src/main/res/layouts/home', 'src/main/res/layouts/navigation', 'src/main/res/layouts/assetList', 'src/main/res/layouts/details'
             }
         }
         androidTest.java.srcDirs += "src/test-common/java"
