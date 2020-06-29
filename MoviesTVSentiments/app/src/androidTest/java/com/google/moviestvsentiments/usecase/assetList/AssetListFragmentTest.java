@@ -53,23 +53,32 @@ public class AssetListFragmentTest {
         hiltAndroidRule.inject();
     }
 
+    private Object[] startsWithEmptyListValues() {
+        return new Object[] {
+            new Object[] {SentimentType.UNSPECIFIED},
+            new Object[] {SentimentType.THUMBS_UP},
+            new Object[] {SentimentType.THUMBS_DOWN}
+        };
+    }
+
     @Test
     @Parameters(method = "startsWithEmptyListValues")
-    public void assetListFragment_startsWithEmptyList(SentimentType sentimentType, int listId) {
+    public void assetListFragment_startsWithEmptyList(SentimentType sentimentType) {
         HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
                 createFragmentArgs(sentimentType));
 
-        onView(withId(listId)).check(withItemCount(0));
+        onView(withId(R.id.movies_list)).check(withItemCount(0));
+        onView(withId(R.id.tvshows_list)).check(withItemCount(0));
     }
 
-    private Object[] startsWithEmptyListValues() {
+    private Object[] displaysAssetsWithSentimentValues() {
         return new Object[] {
-            new Object[] {SentimentType.UNSPECIFIED, R.id.movies_list},
-            new Object[] {SentimentType.THUMBS_UP, R.id.movies_list},
-            new Object[] {SentimentType.THUMBS_DOWN, R.id.movies_list},
-            new Object[] {SentimentType.UNSPECIFIED, R.id.tvshows_list},
-            new Object[] {SentimentType.THUMBS_UP, R.id.tvshows_list},
-            new Object[] {SentimentType.THUMBS_DOWN, R.id.tvshows_list}
+            new Object[] {SentimentType.UNSPECIFIED, AssetType.MOVIE, R.id.movies_list},
+            new Object[] {SentimentType.UNSPECIFIED, AssetType.SHOW, R.id.tvshows_list},
+            new Object[] {SentimentType.THUMBS_UP, AssetType.MOVIE, R.id.movies_list},
+            new Object[] {SentimentType.THUMBS_UP, AssetType.SHOW, R.id.tvshows_list},
+            new Object[] {SentimentType.THUMBS_DOWN, AssetType.MOVIE, R.id.movies_list},
+            new Object[] {SentimentType.THUMBS_DOWN, AssetType.SHOW, R.id.tvshows_list},
         };
     }
 
@@ -89,17 +98,6 @@ public class AssetListFragmentTest {
         onView(withId(listId)).check(withItemCount(1));
     }
 
-    private Object[] displaysAssetsWithSentimentValues() {
-        return new Object[] {
-            new Object[] {SentimentType.UNSPECIFIED, AssetType.MOVIE, R.id.movies_list},
-            new Object[] {SentimentType.UNSPECIFIED, AssetType.SHOW, R.id.tvshows_list},
-            new Object[] {SentimentType.THUMBS_UP, AssetType.MOVIE, R.id.movies_list},
-            new Object[] {SentimentType.THUMBS_UP, AssetType.SHOW, R.id.tvshows_list},
-            new Object[] {SentimentType.THUMBS_DOWN, AssetType.MOVIE, R.id.movies_list},
-            new Object[] {SentimentType.THUMBS_DOWN, AssetType.SHOW, R.id.tvshows_list},
-        };
-    }
-
     @Test
     public void assetListFragment_withUnspecified_displaysAssetsWithNoReaction() {
         database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId1"));
@@ -108,6 +106,23 @@ public class AssetListFragmentTest {
                 createFragmentArgs(SentimentType.UNSPECIFIED));
 
         onView(withId(R.id.movies_list)).check(withItemCount(1));
+    }
+
+    private Object[] ignoresAssetsWithOtherSentimentValues() {
+        return new Object[] {
+            new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_UP, AssetType.MOVIE},
+            new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_DOWN, AssetType.MOVIE},
+            new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_UP, AssetType.SHOW},
+            new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_DOWN, AssetType.SHOW},
+            new Object[] {SentimentType.THUMBS_UP, SentimentType.UNSPECIFIED, AssetType.MOVIE},
+            new Object[] {SentimentType.THUMBS_UP, SentimentType.THUMBS_DOWN, AssetType.MOVIE},
+            new Object[] {SentimentType.THUMBS_UP, SentimentType.UNSPECIFIED, AssetType.SHOW},
+            new Object[] {SentimentType.THUMBS_UP, SentimentType.THUMBS_DOWN, AssetType.SHOW},
+            new Object[] {SentimentType.THUMBS_DOWN, SentimentType.THUMBS_UP, AssetType.MOVIE},
+            new Object[] {SentimentType.THUMBS_DOWN, SentimentType.UNSPECIFIED, AssetType.MOVIE},
+            new Object[] {SentimentType.THUMBS_DOWN, SentimentType.THUMBS_UP, AssetType.SHOW},
+            new Object[] {SentimentType.THUMBS_DOWN, SentimentType.UNSPECIFIED, AssetType.SHOW},
+        };
     }
 
     @Test
@@ -125,22 +140,5 @@ public class AssetListFragmentTest {
 
         onView(withId(R.id.movies_list)).check(withItemCount(0));
         onView(withId(R.id.tvshows_list)).check(withItemCount(0));
-    }
-
-    private Object[] ignoresAssetsWithOtherSentimentValues() {
-        return new Object[] {
-                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_UP, AssetType.MOVIE},
-                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_DOWN, AssetType.MOVIE},
-                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_UP, AssetType.SHOW},
-                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_DOWN, AssetType.SHOW},
-                new Object[] {SentimentType.THUMBS_UP, SentimentType.UNSPECIFIED, AssetType.MOVIE},
-                new Object[] {SentimentType.THUMBS_UP, SentimentType.THUMBS_DOWN, AssetType.MOVIE},
-                new Object[] {SentimentType.THUMBS_UP, SentimentType.UNSPECIFIED, AssetType.SHOW},
-                new Object[] {SentimentType.THUMBS_UP, SentimentType.THUMBS_DOWN, AssetType.SHOW},
-                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.THUMBS_UP, AssetType.MOVIE},
-                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.UNSPECIFIED, AssetType.MOVIE},
-                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.THUMBS_UP, AssetType.SHOW},
-                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.UNSPECIFIED, AssetType.SHOW},
-        };
     }
 }
