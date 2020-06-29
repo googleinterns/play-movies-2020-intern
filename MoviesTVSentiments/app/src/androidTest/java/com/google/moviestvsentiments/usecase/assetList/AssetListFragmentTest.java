@@ -17,16 +17,20 @@ import com.google.moviestvsentiments.service.database.SentimentsDatabase;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import javax.inject.Inject;
 import dagger.hilt.android.testing.HiltAndroidRule;
 import dagger.hilt.android.testing.HiltAndroidTest;
 import dagger.hilt.android.testing.UninstallModules;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
 import com.google.moviestvsentiments.HiltFragmentScenario;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import com.google.moviestvsentiments.util.AssetUtil;
 
 @UninstallModules(DatabaseModule.class)
 @HiltAndroidTest
+@RunWith(JUnitParamsRunner.class)
 public class AssetListFragmentTest {
 
     private static Bundle createFragmentArgs(SentimentType sentimentType) {
@@ -50,19 +54,50 @@ public class AssetListFragmentTest {
     }
 
     @Test
-    public void assetListFragment_startsWithEmptyMovieList() {
+    @Parameters(method = "startsWithEmptyListValues")
+    public void assetListFragment_startsWithEmptyList(SentimentType sentimentType, int listId) {
         HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
-                createFragmentArgs(SentimentType.THUMBS_UP));
+                createFragmentArgs(sentimentType));
 
-        onView(withId(R.id.movies_list)).check(withItemCount(0));
+        onView(withId(listId)).check(withItemCount(0));
+    }
+
+    private Object[] startsWithEmptyListValues() {
+        return new Object[] {
+            new Object[] {SentimentType.UNSPECIFIED, R.id.movies_list},
+            new Object[] {SentimentType.THUMBS_UP, R.id.movies_list},
+            new Object[] {SentimentType.THUMBS_DOWN, R.id.movies_list},
+            new Object[] {SentimentType.UNSPECIFIED, R.id.tvshows_list},
+            new Object[] {SentimentType.THUMBS_UP, R.id.tvshows_list},
+            new Object[] {SentimentType.THUMBS_DOWN, R.id.tvshows_list}
+        };
     }
 
     @Test
-    public void assetListFragment_startsWithEmptyShowList() {
-        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
-                createFragmentArgs(SentimentType.UNSPECIFIED));
+    @Parameters(method = "displaysAssetsWithSentimentValues")
+    public void assetListFragment_withSentiment_displaysAssetsWithSentiment(
+            SentimentType sentimentType, AssetType assetType, int listId) {
+        database.assetSentimentDao().addAsset(AssetUtil.createAsset("assetId1", assetType));
+        database.assetSentimentDao().updateSentiment("Test Account", "assetId1",
+                assetType, sentimentType);
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
+        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
 
-        onView(withId(R.id.tvshows_list)).check(withItemCount(0));
+        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
+                createFragmentArgs(sentimentType));
+
+        onView(withId(listId)).check(withItemCount(1));
+    }
+
+    private Object[] displaysAssetsWithSentimentValues() {
+        return new Object[] {
+            new Object[] {SentimentType.UNSPECIFIED, AssetType.MOVIE, R.id.movies_list},
+            new Object[] {SentimentType.UNSPECIFIED, AssetType.SHOW, R.id.tvshows_list},
+            new Object[] {SentimentType.THUMBS_UP, AssetType.MOVIE, R.id.movies_list},
+            new Object[] {SentimentType.THUMBS_UP, AssetType.SHOW, R.id.tvshows_list},
+            new Object[] {SentimentType.THUMBS_DOWN, AssetType.MOVIE, R.id.movies_list},
+            new Object[] {SentimentType.THUMBS_DOWN, AssetType.SHOW, R.id.tvshows_list},
+        };
     }
 
     @Test
@@ -76,137 +111,36 @@ public class AssetListFragmentTest {
     }
 
     @Test
-    public void assetListFragment_withUnspecified_displaysAssetsWithUnspecifiedReaction() {
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId1"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId1",
-                AssetType.SHOW, SentimentType.UNSPECIFIED);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.UNSPECIFIED));
-
-        onView(withId(R.id.tvshows_list)).check(withItemCount(1));
-    }
-
-    @Test
-    public void assetListFragment_withUnspecified_ignoresAssetsWithReaction() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId1"));
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId2"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId1",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.MOVIE, SentimentType.THUMBS_DOWN);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.UNSPECIFIED));
-
-        onView(withId(R.id.movies_list)).check(withItemCount(0));
-    }
-
-    @Test
-    public void assetListFragment_withThumbsUp_displaysAssetsWithThumbsUp() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId"));
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId2"));
+    @Parameters(method = "ignoresAssetsWithOtherSentimentValues")
+    public void assetListFragment_withSentiment_ignoresAssetsWithOtherSentiment(
+            SentimentType sentimentType, SentimentType otherSentiment, AssetType assetType) {
+        database.assetSentimentDao().addAsset(AssetUtil.createAsset("assetId", assetType));
         database.assetSentimentDao().updateSentiment("Test Account", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.SHOW, SentimentType.THUMBS_UP);
+                assetType, otherSentiment);
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
         intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
 
         HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.THUMBS_UP));
-
-        onView(withId(R.id.movies_list)).check(withItemCount(1));
-        onView(withId(R.id.tvshows_list)).check(withItemCount(1));
-    }
-
-    @Test
-    public void assetListFragment_withThumbsUp_ignoresAssetsWithUnspecifiedReaction() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId"));
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId2"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.SHOW, SentimentType.UNSPECIFIED);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.THUMBS_UP));
+                createFragmentArgs(sentimentType));
 
         onView(withId(R.id.movies_list)).check(withItemCount(0));
         onView(withId(R.id.tvshows_list)).check(withItemCount(0));
     }
 
-    @Test
-    public void assetListFragment_withThumbsUp_ignoresAssetsWithThumbsDown() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_DOWN);
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId2"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.SHOW, SentimentType.THUMBS_DOWN);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.THUMBS_UP));
-
-        onView(withId(R.id.movies_list)).check(withItemCount(0));
-        onView(withId(R.id.tvshows_list)).check(withItemCount(0));
-    }
-
-    @Test
-    public void assetListFragment_withThumbsDown_displaysAssetsWithThumbsDown() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId"));
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId2"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_DOWN);
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.SHOW, SentimentType.THUMBS_DOWN);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.THUMBS_DOWN));
-
-        onView(withId(R.id.movies_list)).check(withItemCount(1));
-        onView(withId(R.id.tvshows_list)).check(withItemCount(1));
-    }
-
-    @Test
-    public void assetListFragment_withThumbsDown_ignoresAssetsWithUnspecifiedReaction() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId"));
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId2"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.SHOW, SentimentType.UNSPECIFIED);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.THUMBS_DOWN));
-
-        onView(withId(R.id.movies_list)).check(withItemCount(0));
-        onView(withId(R.id.tvshows_list)).check(withItemCount(0));
-    }
-
-    @Test
-    public void assetListFragment_withThumbsDown_ignoresAssetsWithThumbsUp() {
-        database.assetSentimentDao().addAsset(AssetUtil.createMovieAsset("assetId"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
-        database.assetSentimentDao().addAsset(AssetUtil.createShowAsset("assetId2"));
-        database.assetSentimentDao().updateSentiment("Test Account", "assetId2",
-                AssetType.SHOW, SentimentType.THUMBS_UP);
-        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
-        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
-
-        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
-                createFragmentArgs(SentimentType.THUMBS_DOWN));
-
-        onView(withId(R.id.movies_list)).check(withItemCount(0));
-        onView(withId(R.id.tvshows_list)).check(withItemCount(0));
+    private Object[] ignoresAssetsWithOtherSentimentValues() {
+        return new Object[] {
+                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_UP, AssetType.MOVIE},
+                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_DOWN, AssetType.MOVIE},
+                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_UP, AssetType.SHOW},
+                new Object[] {SentimentType.UNSPECIFIED, SentimentType.THUMBS_DOWN, AssetType.SHOW},
+                new Object[] {SentimentType.THUMBS_UP, SentimentType.UNSPECIFIED, AssetType.MOVIE},
+                new Object[] {SentimentType.THUMBS_UP, SentimentType.THUMBS_DOWN, AssetType.MOVIE},
+                new Object[] {SentimentType.THUMBS_UP, SentimentType.UNSPECIFIED, AssetType.SHOW},
+                new Object[] {SentimentType.THUMBS_UP, SentimentType.THUMBS_DOWN, AssetType.SHOW},
+                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.THUMBS_UP, AssetType.MOVIE},
+                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.UNSPECIFIED, AssetType.MOVIE},
+                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.THUMBS_UP, AssetType.SHOW},
+                new Object[] {SentimentType.THUMBS_DOWN, SentimentType.UNSPECIFIED, AssetType.SHOW},
+        };
     }
 }
