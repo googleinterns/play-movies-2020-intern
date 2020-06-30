@@ -25,3 +25,9 @@ jobs:
           api-level: 29
           script: ./gradlew connectedAndroidTest --info
 
+      - name: Upload test report
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: test-report
+          path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/MoviesTVSentiments/app/build/reports/androidTests/connected/ 
