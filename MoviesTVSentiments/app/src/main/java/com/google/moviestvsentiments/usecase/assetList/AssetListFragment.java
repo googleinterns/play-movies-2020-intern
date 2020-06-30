@@ -1,5 +1,6 @@
 package com.google.moviestvsentiments.usecase.assetList;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,9 +8,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.google.moviestvsentiments.R;
+import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentViewModel;
+import com.google.moviestvsentiments.usecase.details.DetailsActivity;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import javax.inject.Inject;
 import dagger.hilt.android.AndroidEntryPoint;
@@ -19,7 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint;
  * arguments.
  */
 @AndroidEntryPoint
-public class AssetListFragment extends Fragment {
+public class AssetListFragment extends Fragment implements AssetListAdapter.AssetClickListener {
+
+    public static final String EXTRA_ASSET_SENTIMENT = "com.google.moviestvsentiments.ASSET_SENTIMENT";
 
     @Inject
     AssetSentimentViewModel viewModel;
@@ -28,7 +33,8 @@ public class AssetListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.asset_lists_screen, container, false);
-        AssetListScreen assetListScreen = AssetListScreen.create(root, container.getContext());
+        AssetListScreen assetListScreen = AssetListScreen.create(this, root,
+                container.getContext());
 
         String accountName = getActivity().getIntent().getStringExtra(SigninActivity.EXTRA_ACCOUNT_NAME);
         SentimentType sentimentType = AssetListFragmentArgs.fromBundle(getArguments())
@@ -39,5 +45,16 @@ public class AssetListFragment extends Fragment {
                 .observe(getViewLifecycleOwner(), shows -> assetListScreen.setShows(shows));
 
         return root;
+    }
+
+    /**
+     * Sends an intent containing the given AssetSentiment object to the DetailsActivity.
+     * @param assetSentiment The AssetSentiment object to pass to the DetailsActivity.
+     */
+    @Override
+    public void onAssetClick(AssetSentiment assetSentiment) {
+        Intent intent = new Intent(getContext(), DetailsActivity.class);
+        intent.putExtra(EXTRA_ASSET_SENTIMENT, assetSentiment);
+        startActivity(intent);
     }
 }

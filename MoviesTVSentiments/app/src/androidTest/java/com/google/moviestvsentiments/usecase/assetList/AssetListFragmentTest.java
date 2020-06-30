@@ -1,16 +1,24 @@
 package com.google.moviestvsentiments.usecase.assetList;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAssertion.withItemCount;
+import static org.hamcrest.Matchers.allOf;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.intent.Intents;
 import com.google.moviestvsentiments.HiltTestActivity;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
+import com.google.moviestvsentiments.model.Asset;
+import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
@@ -25,6 +33,7 @@ import dagger.hilt.android.testing.UninstallModules;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import com.google.moviestvsentiments.HiltFragmentScenario;
+import com.google.moviestvsentiments.usecase.details.DetailsActivity;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import com.google.moviestvsentiments.util.AssetUtil;
 
@@ -140,5 +149,31 @@ public class AssetListFragmentTest {
 
         onView(withId(R.id.movies_list)).check(withItemCount(0));
         onView(withId(R.id.tvshows_list)).check(withItemCount(0));
+    }
+
+    private Object[] sendsIntentToDetailsActivityValues() {
+        return new Object[] {
+            new Object[] {AssetType.MOVIE},
+            new Object[] {AssetType.SHOW}
+        };
+    }
+
+    @Test
+    @Parameters(method = "sendsIntentToDetailsActivityValues")
+    public void assetListFragment_clickAsset_sendsIntentToDetailsActivity(AssetType assetType) {
+        Asset asset = AssetUtil.createAsset("assetId1", assetType);
+        database.assetSentimentDao().addAsset(asset);
+        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+                createFragmentArgs(SentimentType.UNSPECIFIED));
+        Intents.init();
+
+        onView(withId(R.id.asset_card)).perform(click());
+
+        intended(allOf(
+            hasComponent(DetailsActivity.class.getName()),
+            hasExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, AssetSentiment.create(asset,
+                    SentimentType.UNSPECIFIED))
+        ));
+        Intents.release();
     }
 }
