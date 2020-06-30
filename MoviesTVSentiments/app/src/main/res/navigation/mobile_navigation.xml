@@ -7,19 +7,34 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.google.moviestvsentiments.usecase.home.HomeFragment"
+        android:name="com.google.moviestvsentiments.usecase.assetList.AssetListFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/asset_lists_screen" />
+        tools:layout="@layout/asset_lists_screen" >
+        <argument
+            android:name="sentimentType"
+            android:defaultValue="UNSPECIFIED"
+            app:argType="com.google.moviestvsentiments.model.SentimentType" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_liked"
-        android:name="com.google.moviestvsentiments.usecase.liked.LikedFragment"
+        android:name="com.google.moviestvsentiments.usecase.assetList.AssetListFragment"
         android:label="@string/title_liked"
-        tools:layout="@layout/asset_lists_screen" />
+        tools:layout="@layout/asset_lists_screen" >
+        <argument
+            android:name="sentimentType"
+            android:defaultValue="THUMBS_UP"
+            app:argType="com.google.moviestvsentiments.model.SentimentType" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_disliked"
-        android:name="com.google.moviestvsentiments.usecase.disliked.DislikedFragment"
+        android:name="com.google.moviestvsentiments.usecase.assetList.AssetListFragment"
         android:label="@string/title_disliked"
-        tools:layout="@layout/fragment_disliked" />
+        tools:layout="@layout/asset_lists_screen" >
+        <argument
+            android:name="sentimentType"
+            android:defaultValue="THUMBS_DOWN"
+            app:argType="com.google.moviestvsentiments.model.SentimentType" />
+    </fragment>
 </navigation>

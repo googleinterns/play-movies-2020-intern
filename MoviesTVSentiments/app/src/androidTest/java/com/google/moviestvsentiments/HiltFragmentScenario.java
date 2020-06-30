@@ -1,6 +1,7 @@
 package com.google.moviestvsentiments;
 
 import android.content.Intent;
+import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
@@ -13,12 +14,13 @@ public class HiltFragmentScenario {
     /**
      * Launches a fragment hosted by an empty HiltTestActivity.
      * @param fragmentClass The class of the fragment to instantiate.
+     * @param args The arguments to pass to the fragment.
      * @param <F> The type of the fragment.
      */
-    public static <F extends Fragment> void launchHiltFragment(Class<F> fragmentClass) {
+    public static <F extends Fragment> void launchHiltFragment(Class<F> fragmentClass, Bundle args) {
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
                 HiltTestActivity.class);
-        launchHiltFragmentWithIntent(fragmentClass, intent);
+        launchHiltFragmentWithIntent(fragmentClass, intent, args);
     }
 
     /**
@@ -26,14 +28,16 @@ public class HiltFragmentScenario {
      * using activities other than HiltTestActivity or with intent extras.
      * @param fragmentClass The class of the fragment to instantiate.
      * @param intent The intent to use when launching the hosting activity.
+     * @param args The arguments to pass to the fragment.
      * @param <F> The type of the fragment.
      */
     public static <F extends Fragment> void launchHiltFragmentWithIntent(Class<F> fragmentClass,
-                                                                         Intent intent) {
+                                                                     Intent intent, Bundle args) {
         ActivityScenario<HiltTestActivity> activityScenario = ActivityScenario.launch(intent);
         activityScenario.onActivity(activity -> {
             Fragment fragment = activity.getSupportFragmentManager().getFragmentFactory()
                     .instantiate(fragmentClass.getClassLoader(), fragmentClass.getName());
+            fragment.setArguments(args);
             activity.getSupportFragmentManager()
                     .beginTransaction()
                     .add(android.R.id.content, fragment, null)
