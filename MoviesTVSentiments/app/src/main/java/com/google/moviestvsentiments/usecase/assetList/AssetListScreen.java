@@ -16,20 +16,22 @@ public class AssetListScreen {
     private AssetListAdapter movieAdapter;
     private AssetListAdapter showAdapter;
 
-    private AssetListScreen() {
-        movieAdapter = AssetListAdapter.create();
-        showAdapter = AssetListAdapter.create();
+    private AssetListScreen(AssetListAdapter.AssetClickListener assetClickListener) {
+        movieAdapter = AssetListAdapter.create(assetClickListener);
+        showAdapter = AssetListAdapter.create(assetClickListener);
     }
 
     /**
      * Creates a new AssetListScreen.
+     * @param assetClickListener The listener to invoke when an asset is clicked.
      * @param root The root view where the AssetListScreen is displayed. It must contain recycler
      *             views with the movies_list and the tvshows_list ids.
      * @param context The context where the AssetListScreen is displayed.
      * @return A new AssetListScreen.
      */
-    public static AssetListScreen create(View root, Context context) {
-        AssetListScreen assetListScreen = new AssetListScreen();
+    public static AssetListScreen create(AssetListAdapter.AssetClickListener assetClickListener,
+                                         View root, Context context) {
+        AssetListScreen assetListScreen = new AssetListScreen(assetClickListener);
         assetListScreen.setupLists(root, context);
         return assetListScreen;
     }

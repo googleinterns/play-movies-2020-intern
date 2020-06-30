@@ -60,9 +60,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // Auto value
+    // Auto value and parcelable
     api "com.google.auto.value:auto-value-annotations:${autoValueVersion}"
     annotationProcessor "com.google.auto.value:auto-value:${autoValueVersion}"
+    annotationProcessor 'com.ryanharter.auto.value:auto-value-parcel:0.2.7'
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$rootProject.hiltVersion"

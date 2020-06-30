@@ -1,5 +1,6 @@
 package com.google.moviestvsentiments.model;
 
+import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
@@ -11,7 +12,7 @@ import com.google.auto.value.AutoValue;
  */
 @AutoValue
 @Entity(tableName = "assets_table", primaryKeys = {"asset_id", "asset_type"})
-public abstract class Asset {
+public abstract class Asset implements Parcelable {
 
     @AutoValue.CopyAnnotations
     @NonNull
