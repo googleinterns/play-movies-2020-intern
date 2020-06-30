@@ -23,7 +23,10 @@ jobs:
         with:
           working-directory: ./MoviesTVSentiments
           api-level: 29
-          script: ./gradlew connectedAndroidTest --info
+          script: |
+            adb logcat -c
+            adb logcat *:E &
+            ./gradlew connectedAndroidTest
 
       - name: Upload test report
         uses: actions/upload-artifact@v2
