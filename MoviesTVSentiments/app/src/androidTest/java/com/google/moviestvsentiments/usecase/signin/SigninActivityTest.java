@@ -34,10 +34,8 @@ public class SigninActivityTest {
 
     @Rule
     public RuleChain rule = RuleChain.outerRule(new HiltAndroidRule(this))
-            .around(new IntentsTestRule<>(SigninActivity.class));
-
-    @Rule
-    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+            .around(new IntentsTestRule<>(SigninActivity.class))
+            .around(new InstantTaskExecutorRule());
 
     @Test
     public void signinActivity_displaysOnlyAddAccount() {

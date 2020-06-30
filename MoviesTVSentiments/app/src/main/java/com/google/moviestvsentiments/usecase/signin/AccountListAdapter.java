@@ -69,6 +69,7 @@ class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.Account
 
     private AccountListAdapter(AccountClickListener accountClickListener) {
         this.accountClickListener = accountClickListener;
+        accounts = new ArrayList<>();
     }
 
     /**
@@ -107,9 +108,6 @@ class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.Account
 
     @Override
     public int getItemCount() {
-        if (accounts == null) {
-            return 0;
-        }
         // Add one extra item for the Add Account item
         return accounts.size() + 1;
     }
