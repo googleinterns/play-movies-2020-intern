@@ -1,14 +1,14 @@
 package com.google.moviestvsentiments.model;
 
+import android.os.Parcelable;
 import androidx.room.Embedded;
-
 import com.google.auto.value.AutoValue;
 
 /**
  * A container that combines an asset with a sentiment type.
  */
 @AutoValue
-public abstract class AssetSentiment {
+public abstract class AssetSentiment implements Parcelable {
     @AutoValue.CopyAnnotations
     @Embedded
     public abstract Asset asset();
