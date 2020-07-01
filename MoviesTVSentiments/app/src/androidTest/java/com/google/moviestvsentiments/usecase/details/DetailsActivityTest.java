@@ -1,0 +1,84 @@
+package com.google.moviestvsentiments.usecase.details;
+
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.equalTo;
+
+import android.content.Intent;
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.test.rule.ActivityTestRule;
+import com.google.moviestvsentiments.R;
+import com.google.moviestvsentiments.model.Asset;
+import com.google.moviestvsentiments.model.AssetSentiment;
+import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.usecase.assetList.AssetListFragment;
+import com.google.moviestvsentiments.util.AssetUtil;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
+@RunWith(JUnitParamsRunner.class)
+public class DetailsActivityTest {
+
+    @Rule
+    public ActivityTestRule<DetailsActivity> activityTestRule =
+            new ActivityTestRule<>(DetailsActivity.class, false, false);
+
+    @Rule
+    public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
+
+    private Object[] displaysAssetInfoValues() {
+        return new Object[] {
+            new Object[] {SentimentType.UNSPECIFIED},
+            new Object[] {SentimentType.THUMBS_UP},
+            new Object[] {SentimentType.THUMBS_DOWN}
+        };
+    }
+
+    @Test
+    @Parameters(method = "displaysAssetInfoValues")
+    public void detailsActivity_displaysAssetInfo(SentimentType sentimentType) {
+        final String title = "Asset Title";
+        final String plot = "Description of the plot";
+        final String imdbRating = "4.7";
+        Asset asset = AssetUtil.defaultMovieBuilder("assetId").setTitle(title).setPlot(plot)
+                .setImdbRating(imdbRating).build();
+        AssetSentiment assetSentiment = AssetSentiment.create(asset, sentimentType);
+        Intent intent = new Intent();
+        intent.putExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, assetSentiment);
+
+        activityTestRule.launchActivity(intent);
+
+        onView(withId(R.id.asset_title)).check(matches(withText(title)));
+        onView(withId(R.id.description)).check(matches(withText(plot)));
+        onView(withId(R.id.rating)).check(matches(withText(imdbRating)));
+    }
+
+    private Object[] displaysSentimentValues() {
+        return new Object[] {
+            new Object[] {SentimentType.UNSPECIFIED, null, null},
+            new Object[] {SentimentType.THUMBS_UP, R.drawable.ic_baseline_thumb_up_24, null},
+            new Object[] {SentimentType.THUMBS_DOWN, null, R.drawable.ic_baseline_thumb_down_24}
+        };
+    }
+
+    @Test
+    @Parameters(method = "displaysSentimentValues")
+    public void detailsActivity_displaysSentiment(SentimentType sentimentType, Object thumbsUpIcon,
+                                                  Object thumbsDownIcon) {
+        AssetSentiment assetSentiment = AssetSentiment.create(
+                AssetUtil.createMovieAsset("assetId"), sentimentType);
+        Intent intent = new Intent();
+        intent.putExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, assetSentiment);
+
+        activityTestRule.launchActivity(intent);
+
+        onView(withId(R.id.thumbs_up)).check(matches(withTagValue(equalTo(thumbsUpIcon))));
+        onView(withId(R.id.thumbs_down)).check(matches(withTagValue(equalTo(thumbsDownIcon))));
+    }
+}

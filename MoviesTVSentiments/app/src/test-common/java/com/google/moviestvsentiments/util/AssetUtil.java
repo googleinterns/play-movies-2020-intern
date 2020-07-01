@@ -27,9 +27,7 @@ public class AssetUtil {
      * @return A movie asset with the given id.
      */
     public static Asset createMovieAsset(String assetId) {
-        return Asset.builder().setId(assetId).setType(AssetType.MOVIE).setTitle("assetTitle")
-                .setPoster("posterURL").setBanner("bannerURL").setPlot("plotDescription")
-                .setRuntime("runtime").setYear("year").setTimestamp(1).build();
+        return defaultMovieBuilder(assetId).build();
     }
 
     /**
@@ -41,5 +39,16 @@ public class AssetUtil {
         return Asset.builder().setId(assetId).setType(AssetType.SHOW).setTitle("assetTitle")
                 .setPoster("posterURL").setBanner("bannerURL").setYear("year")
                 .setPlot("plotDescription").setRuntime("runtime").setTimestamp(1).build();
+    }
+
+    /**
+     * Returns the default Asset Builder object for a movie asset with the given asset id.
+     * @param assetId The id of the asset to create.
+     * @return The default Asset Builder object for a movie asset with the given asset id.
+     */
+    public static Asset.Builder defaultMovieBuilder(String assetId) {
+        return Asset.builder().setId(assetId).setType(AssetType.MOVIE).setTitle("assetTitle")
+                .setPoster("posterURL").setBanner("bannerURL").setPlot("plotDescription")
+                .setRuntime("runtime").setYear("year").setTimestamp(1);
     }
 }
