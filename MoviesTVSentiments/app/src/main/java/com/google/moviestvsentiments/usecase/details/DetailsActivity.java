@@ -61,6 +61,7 @@ public class DetailsActivity extends AppCompatActivity {
                 thumbsDown.setTag(R.drawable.ic_baseline_thumb_down_24);
                 break;
             default:
+                // by default the ImageViews start with the outlined images, so no action is needed
         }
     }
 }

@@ -43,17 +43,20 @@ public class DetailsActivityTest {
     @Test
     @Parameters(method = "displaysAssetInfoValues")
     public void detailsActivity_displaysAssetInfo(SentimentType sentimentType) {
-        Asset asset = AssetUtil.defaultMovieBuilder("assetId").setTitle("Asset Title")
-                .setPlot("Description of the plot").setImdbRating("4.7").build();
+        final String title = "Asset Title";
+        final String plot = "Description of the plot";
+        final String imdbRating = "4.7";
+        Asset asset = AssetUtil.defaultMovieBuilder("assetId").setTitle(title).setPlot(plot)
+                .setImdbRating(imdbRating).build();
         AssetSentiment assetSentiment = AssetSentiment.create(asset, sentimentType);
         Intent intent = new Intent();
         intent.putExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, assetSentiment);
 
         activityTestRule.launchActivity(intent);
 
-        onView(withId(R.id.asset_title)).check(matches(withText("Asset Title")));
-        onView(withId(R.id.rating)).check(matches(withText("4.7")));
-        onView(withId(R.id.description)).check(matches(withText("Description of the plot")));
+        onView(withId(R.id.asset_title)).check(matches(withText(title)));
+        onView(withId(R.id.description)).check(matches(withText(plot)));
+        onView(withId(R.id.rating)).check(matches(withText(imdbRating)));
     }
 
     private Object[] displaysSentimentValues() {
