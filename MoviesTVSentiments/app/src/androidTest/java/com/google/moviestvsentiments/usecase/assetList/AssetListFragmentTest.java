@@ -161,9 +161,12 @@ public class AssetListFragmentTest {
     @Test
     @Parameters(method = "sendsIntentToDetailsActivityValues")
     public void assetListFragment_clickAsset_sendsIntentToDetailsActivity(AssetType assetType) {
+        final String accountName = "Test Account";
         Asset asset = AssetUtil.createAsset("assetId1", assetType);
         database.assetSentimentDao().addAsset(asset);
-        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+        Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
+        intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, accountName);
+        HiltFragmentScenario.launchHiltFragmentWithIntent(AssetListFragment.class, intent,
                 createFragmentArgs(SentimentType.UNSPECIFIED));
         Intents.init();
 
@@ -171,6 +174,7 @@ public class AssetListFragmentTest {
 
         intended(allOf(
             hasComponent(DetailsActivity.class.getName()),
+            hasExtra(AssetListFragment.EXTRA_ACCOUNT_NAME, accountName),
             hasExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, AssetSentiment.create(asset,
                     SentimentType.UNSPECIFIED))
         ));
