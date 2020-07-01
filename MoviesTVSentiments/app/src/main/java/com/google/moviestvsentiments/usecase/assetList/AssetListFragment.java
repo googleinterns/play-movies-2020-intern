@@ -24,10 +24,13 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class AssetListFragment extends Fragment implements AssetListAdapter.AssetClickListener {
 
+    public static final String EXTRA_ACCOUNT_NAME = "com.google.moviestvsentiments.ACCOUNT_NAME";
     public static final String EXTRA_ASSET_SENTIMENT = "com.google.moviestvsentiments.ASSET_SENTIMENT";
 
     @Inject
     AssetSentimentViewModel viewModel;
+
+    private String accountName;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -36,7 +39,7 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
         AssetListScreen assetListScreen = AssetListScreen.create(this, root,
                 container.getContext());
 
-        String accountName = getActivity().getIntent().getStringExtra(SigninActivity.EXTRA_ACCOUNT_NAME);
+        accountName = getActivity().getIntent().getStringExtra(SigninActivity.EXTRA_ACCOUNT_NAME);
         SentimentType sentimentType = AssetListFragmentArgs.fromBundle(getArguments())
                 .getSentimentType();
         viewModel.getAssets(AssetType.MOVIE, accountName, sentimentType)
@@ -48,12 +51,14 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
     }
 
     /**
-     * Sends an intent containing the given AssetSentiment object to the DetailsActivity.
+     * Sends an intent containing the current account name and the given AssetSentiment object to
+     * the DetailsActivity.
      * @param assetSentiment The AssetSentiment object to pass to the DetailsActivity.
      */
     @Override
     public void onAssetClick(AssetSentiment assetSentiment) {
         Intent intent = new Intent(getContext(), DetailsActivity.class);
+        intent.putExtra(EXTRA_ACCOUNT_NAME, accountName);
         intent.putExtra(EXTRA_ASSET_SENTIMENT, assetSentiment);
         startActivity(intent);
     }
