@@ -2,6 +2,7 @@ package com.google.moviestvsentiments.account;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.time.Instant;
 import java.util.Objects;
 
 /**
@@ -12,12 +13,12 @@ public class Account {
     
     @Id
     private String accountName;
-    private long timestamp;
+    private Instant timestamp;
 
     // The default constructor is required by the Spring JPA.
     protected Account() {}
 
-    private Account(String accountName, long timestamp) {
+    private Account(String accountName, Instant timestamp) {
         this.accountName = accountName;
         this.timestamp = timestamp;
     }
@@ -28,7 +29,7 @@ public class Account {
      * @param timestamp The timestamp for the new account.
      * @return A new Account with the given name and timestamp.
      */
-    public static Account create(String accountName, long timestamp) {
+    public static Account create(String accountName, Instant timestamp) {
         return new Account(accountName, timestamp);
     }
 
@@ -50,7 +51,7 @@ public class Account {
     /**
      * Returns the account's timestamp.
      */
-    public long getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
@@ -58,7 +59,7 @@ public class Account {
      * Sets the account's timestamp.
      * @param timestamp The new timestamp for the account.
      */
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -67,7 +68,7 @@ public class Account {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
-        return timestamp == account.timestamp &&
+        return timestamp.equals(account.timestamp) &&
                 accountName.equals(account.accountName);
     }
 

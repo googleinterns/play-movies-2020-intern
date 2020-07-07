@@ -18,14 +18,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.web.servlet.MockMvc;
+import java.time.Instant;
 import java.util.Arrays;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AccountControllerTest {
 
-    private static final Account ACCOUNT_1 = Account.create("Test Name 1", 0);
-    private static final Account ACCOUNT_2 = Account.create("Test Name 2", 1);
+    private static final Account ACCOUNT_1 = Account.create("Test Name 1", Instant.ofEpochSecond(0));
+    private static final Account ACCOUNT_2 = Account.create("Test Name 2", Instant.ofEpochSecond(1));
     private static final String ACCOUNT_LIST_JSON = "[ { \"accountName\": \"Test Name 1\", \"timestamp\": 0 }, " +
             "{\"accountName\": \"Test Name 2\", \"timestamp\": 1} ]";
 
@@ -43,9 +44,9 @@ public class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].accountName", equalTo(ACCOUNT_1.getAccountName())))
-                .andExpect(jsonPath("$[0].timestamp", equalTo((int)ACCOUNT_1.getTimestamp())))
+                .andExpect(jsonPath("$[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
                 .andExpect(jsonPath("$[1].accountName", equalTo(ACCOUNT_2.getAccountName())))
-                .andExpect(jsonPath("$[1].timestamp", equalTo((int)ACCOUNT_2.getTimestamp())));
+                .andExpect(jsonPath("$[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
     }
 
     @Test
@@ -67,9 +68,9 @@ public class AccountControllerTest {
 
         mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).content(ACCOUNT_LIST_JSON))
                 .andExpect(jsonPath("$.accounts[0].accountName", equalTo(ACCOUNT_1.getAccountName())))
-                .andExpect(jsonPath("$.accounts[0].timestamp", equalTo((int)ACCOUNT_1.getTimestamp())))
+                .andExpect(jsonPath("$.accounts[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
                 .andExpect(jsonPath("$.accounts[1].accountName", equalTo(ACCOUNT_2.getAccountName())))
-                .andExpect(jsonPath("$.accounts[1].timestamp", equalTo((int)ACCOUNT_2.getTimestamp())));
+                .andExpect(jsonPath("$.accounts[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
     }
 
     @Test
