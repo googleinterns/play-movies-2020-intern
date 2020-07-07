@@ -14,8 +14,20 @@ jobs:
         with:
           java-version: 1.8      
 
+      - name: Run server JUnit tests
+        run: bash ./gradlew test
+        working-directory: ./server
+ 
+      - name: Upload server test report
+        uses: actions/upload-artifact@v2
+        if: ${{ !cancelled() }}
+        with:
+          name: server-test-report
+          path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/server/build/reports/tests/test/
+
       - name: Run app JUnit and Espresso tests
         uses: reactivecircus/android-emulator-runner@v2
+        if: ${{ !cancelled() }}
         with:
           working-directory: ./MoviesTVSentiments
           api-level: 29
@@ -26,16 +38,8 @@ jobs:
 
       - name: Upload app test report
         uses: actions/upload-artifact@v2
+        if: ${{ !cancelled() }}
         with:
           name: app-test-report
           path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/MoviesTVSentiments/app/build/reports/
 
-      - name: Run server JUnit tests
-        run: bash ./gradlew test
-        working-directory: ./server
- 
-      - name: Upload server test report
-        uses: actions/upload-artifact@v2
-        with:
-          name: server-test-report
-          path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/server/build/reports/tests/test/
