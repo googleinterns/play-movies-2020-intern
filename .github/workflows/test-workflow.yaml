@@ -14,11 +14,7 @@ jobs:
         with:
           java-version: 1.8      
 
-      - name: Run JUnit tests
-        run: bash ./gradlew test
-        working-directory: ./MoviesTVSentiments
-
-      - name: Run Espresso tests
+      - name: Run app JUnit and Espresso tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           working-directory: ./MoviesTVSentiments
@@ -26,11 +22,20 @@ jobs:
           script: |
             adb logcat -c
             adb logcat *:E &
-            ./gradlew connectedAndroidTest
+            ./gradlew jacocoTestReport
 
-      - name: Upload test report
+      - name: Upload app test report
         uses: actions/upload-artifact@v2
-        if: failure()
         with:
-          name: test-report
-          path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/MoviesTVSentiments/app/build/reports/androidTests/connected/ 
+          name: app-test-report
+          path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/MoviesTVSentiments/app/build/reports/
+
+      - name: Run server JUnit tests
+        run: bash ./gradlew test
+        working-directory: ./server
+ 
+      - name: Upload server test report
+        uses: actions/upload-artifact@v2
+        with:
+          name: server-test-report
+          path: /Users/runner/work/play-movies-2020-intern/play-movies-2020-intern/server/build/reports/tests/test/
