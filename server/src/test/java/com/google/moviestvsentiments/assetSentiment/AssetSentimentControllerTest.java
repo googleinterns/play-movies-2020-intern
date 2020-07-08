@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 @SpringBootTest
@@ -19,7 +20,25 @@ import java.util.Arrays;
 public class AssetSentimentControllerTest {
 
     private static final String ACCOUNT_NAME = "testAccount";
-    private static final Asset ASSET = Asset.create("assetId", AssetType.MOVIE, "assetTitle");
+    private static final Asset ASSET = createAsset("assetId", AssetType.MOVIE, "assetTitle");
+
+    private static Asset createAsset(String assetId, AssetType assetType, String title) {
+        Asset asset = new Asset();
+        asset.setAssetId(assetId);
+        asset.setAssetType(assetType);
+        asset.setTitle(title);
+        return asset;
+    }
+
+    private static UserSentiment createUserSentiment(String assetId, String accountName, AssetType assetType,
+                                                     SentimentType sentimentType) {
+        UserSentiment sentiment = new UserSentiment();
+        sentiment.setAssetId(assetId);
+        sentiment.setAccountName(accountName);
+        sentiment.setAssetType(assetType);
+        sentiment.setSentimentType(sentimentType);
+        return sentiment;
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -38,7 +57,7 @@ public class AssetSentimentControllerTest {
 
     @Test
     public void getAssets_withReaction_returnsAssets() throws Exception {
-        UserSentiment sentiment = UserSentiment.create(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
+        UserSentiment sentiment = createUserSentiment(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
                 SentimentType.THUMBS_UP);
         when(assetSentimentRepository.getAssetsWithSentiment(AssetType.MOVIE, ACCOUNT_NAME, SentimentType.THUMBS_UP))
                 .thenReturn(Arrays.asList(new AssetSentiment(ASSET, sentiment)));
@@ -63,11 +82,11 @@ public class AssetSentimentControllerTest {
 
     @Test
     public void getAssets_withUnspecified_returnsAssets() throws Exception {
-        UserSentiment sentiment = UserSentiment.create(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
+        UserSentiment sentiment = createUserSentiment(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
                 SentimentType.UNSPECIFIED);
-        Asset asset2 = Asset.create("assetId2", AssetType.MOVIE, "assetTitle2");
+        Asset asset2 = createAsset("assetId2", AssetType.MOVIE, "assetTitle2");
         when(assetSentimentRepository.getAssetsWithSentiment(AssetType.MOVIE, ACCOUNT_NAME, SentimentType.UNSPECIFIED))
-                .thenReturn(Arrays.asList(new AssetSentiment(ASSET, sentiment)));
+                .thenReturn(new ArrayList<>(Arrays.asList(new AssetSentiment(ASSET, sentiment))));
         when(assetSentimentRepository.getAssetsWithoutSentiment(AssetType.MOVIE, ACCOUNT_NAME))
                 .thenReturn(Arrays.asList(new AssetSentiment(asset2, null)));
 

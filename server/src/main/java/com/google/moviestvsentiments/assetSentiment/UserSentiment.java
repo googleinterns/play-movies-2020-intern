@@ -71,29 +71,6 @@ public class UserSentiment {
     private SentimentType sentimentType;
     private Instant timestamp;
 
-    // This constructor is required for Spring JPA.
-    public UserSentiment() {}
-
-    private UserSentiment(String assetId, String accountName, AssetType assetType, SentimentType sentimentType) {
-        this.assetId = assetId;
-        this.accountName = accountName;
-        this.assetType = assetType;
-        this.sentimentType = sentimentType;
-    }
-
-    /**
-     * Creates a new UserSentiment with the provided Asset id, account name, AssetType and SentimentType.
-     * @param assetId The id of the asset associated with this sentiment.
-     * @param accountName The name of the account associated with this sentiment.
-     * @param assetType The type of the asset associated with this sentiment.
-     * @param sentimentType The type of the sentiment.
-     * @return
-     */
-    public static UserSentiment create(String assetId, String accountName, AssetType assetType,
-                                       SentimentType sentimentType) {
-        return new UserSentiment(assetId, accountName, assetType, sentimentType);
-    }
-
     /**
      * Returns the id of the asset associated with this sentiment.
      */
