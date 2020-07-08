@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.assetSentiment;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +24,13 @@ public class AssetSentimentControllerTest {
 
     private static final String ACCOUNT_NAME = "testAccount";
     private static final Asset ASSET = createAsset("assetId", AssetType.MOVIE, "assetTitle");
+    private static final UserSentiment SENTIMENT_1 = createUserSentiment("assetId", ACCOUNT_NAME, AssetType.MOVIE,
+            SentimentType.THUMBS_UP);
+    private static final UserSentiment SENTIMENT_2 = createUserSentiment("assetId2", ACCOUNT_NAME, AssetType.SHOW,
+            SentimentType.THUMBS_DOWN);
+    private static final String SENTIMENT_LIST_JSON = "[ { \"assetId\": \"assetId\", \"assetType\": \"MOVIE\", " +
+            "\"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_UP\"}, {\"assetId\": \"assetId2\", " +
+            "\"assetType\": \"SHOW\", \"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_DOWN\"} ]";
 
     private static Asset createAsset(String assetId, AssetType assetType, String title) {
         Asset asset = new Asset();
@@ -45,6 +55,9 @@ public class AssetSentimentControllerTest {
 
     @MockBean
     private AssetSentimentRepository assetSentimentRepository;
+
+    @MockBean
+    private UserSentimentRepository userSentimentRepository;
 
     @Test
     public void getAssets_withReaction_invokesRepositoryOnce() throws Exception {
@@ -98,5 +111,68 @@ public class AssetSentimentControllerTest {
                 .andExpect(jsonPath("$[1].asset.assetId", equalTo(asset2.getAssetId())))
                 .andExpect(jsonPath("$[1].asset.assetType", equalTo("MOVIE")))
                 .andExpect(jsonPath("$[1].asset.title", equalTo(asset2.getTitle())));
+    }
+
+    @Test
+    public void updateSentiments_invokesRepository() throws Exception {
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON));
+
+        verify(userSentimentRepository).saveAll(Arrays.asList(SENTIMENT_1, SENTIMENT_2));
+    }
+
+    @Test
+    public void updateSentiments_successful_returnsOk() throws Exception {
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateSentiments_successful_returnsSentiments() throws Exception {
+        when(userSentimentRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(SENTIMENT_1, SENTIMENT_2));
+
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(jsonPath("$.sentiments[0].sentimentType", equalTo("THUMBS_UP")))
+                .andExpect(jsonPath("$.sentiments[1].sentimentType", equalTo("THUMBS_DOWN")));
+    }
+
+    @Test
+    public void updateSentiments_successful_returnsNullError() throws Exception {
+        when(userSentimentRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(SENTIMENT_1, SENTIMENT_2));
+
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(jsonPath("$.error", equalTo(null)));
+    }
+
+    @Test
+    public void updateSentiments_jpaException_returnsBadRequest() throws Exception {
+        when(userSentimentRepository.saveAll(any(Iterable.class))).thenThrow(JpaSystemException.class);
+
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void updateSentiments_otherException_returnsServerError() throws Exception {
+        when(userSentimentRepository.saveAll(any(Iterable.class))).thenThrow(RuntimeException.class);
+
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void updateSentiments_failure_returnsNullList() throws Exception {
+        when(userSentimentRepository.saveAll(any(Iterable.class))).thenThrow(JpaSystemException.class);
+
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(jsonPath("$.sentiments", equalTo(null)));
+    }
+
+    @Test
+    public void updateSentiments_failure_returnsError() throws Exception {
+        final String errorMessage = "Error message";
+        when(userSentimentRepository.saveAll(any(Iterable.class))).thenThrow(new RuntimeException(errorMessage));
+
+        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
+                .andExpect(jsonPath("$.error", equalTo(errorMessage)));
     }
 }
