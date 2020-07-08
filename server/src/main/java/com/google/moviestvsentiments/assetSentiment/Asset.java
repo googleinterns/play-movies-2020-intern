@@ -72,6 +72,26 @@ public class Asset {
     private String year;
     private Instant timestamp;
 
+    // This constructor is required for Spring JPA.
+    public Asset() {}
+
+    private Asset(String assetId, AssetType assetType, String title) {
+        this.assetId = assetId;
+        this.assetType = assetType;
+        this.title = title;
+    }
+
+    /**
+     * Creates a new Asset with the provided id, type and title.
+     * @param assetId The id of the new Asset.
+     * @param assetType The type of the new Asset.
+     * @param title The title of the new Asset.
+     * @return A new Asset with the provided id, type and title.
+     */
+    public static Asset create(String assetId, AssetType assetType, String title) {
+        return new Asset(assetId, assetType, title);
+    }
+
     /**
      * Returns the asset id.
      */
