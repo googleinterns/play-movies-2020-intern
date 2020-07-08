@@ -145,4 +145,21 @@ public class UserSentiment {
     public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserSentiment sentiment = (UserSentiment) o;
+        return assetId.equals(sentiment.assetId) &&
+                accountName.equals(sentiment.accountName) &&
+                assetType == sentiment.assetType &&
+                sentimentType == sentiment.sentimentType &&
+                Objects.equals(timestamp, sentiment.timestamp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(assetId, accountName, assetType, sentimentType, timestamp);
+    }
 }
