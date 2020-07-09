@@ -19,6 +19,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Provides functions to support scraping Assets from OMDB.
@@ -116,10 +117,7 @@ public class AssetScraper {
             String url = "http://www.omdbapi.com/?plot=full&apikey=" + omdbApiKey + "&i=" + assetId;
             HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(url));
             OmdbResponse response = request.execute().parseAs(OmdbResponse.class);
-            Asset asset = createAsset(response);
-            if (asset != null) {
-                assets.add(asset);
-            }
+            createAsset(response).ifPresent(asset -> assets.add(asset));
         }
         return assets;
     }
@@ -129,7 +127,7 @@ public class AssetScraper {
      * @param omdbResponse The OmdbResponse to use when creating the Asset.
      * @return A new Asset created using the OmdbResponse.
      */
-    private Asset createAsset(OmdbResponse omdbResponse) {
+    private Optional<Asset> createAsset(OmdbResponse omdbResponse) {
         Asset asset = new Asset();
         asset.setAssetId(omdbResponse.assetId);
         asset.setTitle(omdbResponse.title);
@@ -146,12 +144,12 @@ public class AssetScraper {
             asset.setAssetType(AssetType.SHOW);
         } else {
             logger.warn("Unknown OMDB asset type: " + omdbResponse.assetType);
-            return null;
+            return Optional.empty();
         }
 
         omdbResponse.ratings.stream().filter(rating -> OMDB_ROTTEN_TOMATOES_SOURCE.equals(rating))
                 .findAny().ifPresent(rating -> asset.setRottenTomatoesRating(rating.value));
 
-        return asset;
+        return Optional.of(asset);
     }
 }
