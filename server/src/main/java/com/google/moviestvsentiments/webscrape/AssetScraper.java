@@ -11,6 +11,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
 import com.google.moviestvsentiments.assetSentiment.Asset;
 import com.google.moviestvsentiments.assetSentiment.AssetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.time.Clock;
@@ -53,11 +55,13 @@ public class AssetScraper {
 
     private final Clock clock;
     private final HttpRequestFactory requestFactory;
+    private final Logger logger;
 
     // Public default constructor is required for Spring to autowire AssetScraper in AssetScrapeController.
     public AssetScraper() {
         clock = Clock.systemUTC();
         requestFactory = defaultRequestFactory();
+        logger = LoggerFactory.getLogger(AssetScraper.class);
     }
 
     /**
@@ -112,7 +116,10 @@ public class AssetScraper {
             String url = "http://www.omdbapi.com/?plot=full&apikey=" + omdbApiKey + "&i=" + assetId;
             HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(url));
             OmdbResponse response = request.execute().parseAs(OmdbResponse.class);
-            assets.add(createAsset(response));
+            Asset asset = createAsset(response);
+            if (asset != null) {
+                assets.add(asset);
+            }
         }
         return assets;
     }
@@ -138,14 +145,12 @@ public class AssetScraper {
         } else if (OMDB_SHOW_TYPE.equals(omdbResponse.assetType)) {
             asset.setAssetType(AssetType.SHOW);
         } else {
-            throw new AssertionError("Unknown OMDB asset type: " + omdbResponse.assetType);
+            logger.warn("Unknown OMDB asset type: " + omdbResponse.assetType);
+            return null;
         }
 
-        for (OmdbResponse.Rating rating : omdbResponse.ratings) {
-            if (OMDB_ROTTEN_TOMATOES_SOURCE.equals(rating.source)) {
-                asset.setRottenTomatoesRating(rating.value);
-            }
-        }
+        omdbResponse.ratings.stream().filter(rating -> OMDB_ROTTEN_TOMATOES_SOURCE.equals(rating))
+                .findAny().ifPresent(rating -> asset.setRottenTomatoesRating(rating.value));
 
         return asset;
     }
