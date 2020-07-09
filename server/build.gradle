@@ -19,6 +19,8 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+	implementation 'net.sourceforge.htmlunit:htmlunit'
+	compile 'com.google.api-client:google-api-client:1.30.9'
 }
 
 test {

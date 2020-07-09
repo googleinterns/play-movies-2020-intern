@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.google.moviestvsentiments.AssetUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -23,7 +24,7 @@ import java.util.Arrays;
 public class AssetSentimentControllerTest {
 
     private static final String ACCOUNT_NAME = "testAccount";
-    private static final Asset ASSET = createAsset("assetId", AssetType.MOVIE, "assetTitle");
+    private static final Asset ASSET = AssetUtil.createAsset("assetId", AssetType.MOVIE, "assetTitle");
     private static final UserSentiment SENTIMENT_1 = createUserSentiment("assetId", ACCOUNT_NAME, AssetType.MOVIE,
             SentimentType.THUMBS_UP);
     private static final UserSentiment SENTIMENT_2 = createUserSentiment("assetId2", ACCOUNT_NAME, AssetType.SHOW,
@@ -31,14 +32,6 @@ public class AssetSentimentControllerTest {
     private static final String SENTIMENT_LIST_JSON = "[ { \"assetId\": \"assetId\", \"assetType\": \"MOVIE\", " +
             "\"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_UP\"}, {\"assetId\": \"assetId2\", " +
             "\"assetType\": \"SHOW\", \"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_DOWN\"} ]";
-
-    private static Asset createAsset(String assetId, AssetType assetType, String title) {
-        Asset asset = new Asset();
-        asset.setAssetId(assetId);
-        asset.setAssetType(assetType);
-        asset.setTitle(title);
-        return asset;
-    }
 
     private static UserSentiment createUserSentiment(String assetId, String accountName, AssetType assetType,
                                                      SentimentType sentimentType) {
@@ -97,7 +90,7 @@ public class AssetSentimentControllerTest {
     public void getAssets_withUnspecified_returnsAssets() throws Exception {
         UserSentiment sentiment = createUserSentiment(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
                 SentimentType.UNSPECIFIED);
-        Asset asset2 = createAsset("assetId2", AssetType.MOVIE, "assetTitle2");
+        Asset asset2 = AssetUtil.createAsset("assetId2", AssetType.MOVIE, "assetTitle2");
         when(assetSentimentRepository.getAssetsWithSentiment(AssetType.MOVIE, ACCOUNT_NAME, SentimentType.UNSPECIFIED))
                 .thenReturn(new ArrayList<>(Arrays.asList(new AssetSentiment(ASSET, sentiment))));
         when(assetSentimentRepository.getAssetsWithoutSentiment(AssetType.MOVIE, ACCOUNT_NAME))
