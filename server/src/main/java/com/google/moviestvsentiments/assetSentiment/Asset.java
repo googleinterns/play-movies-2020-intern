@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.assetSentiment;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Lob;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
@@ -67,7 +68,7 @@ public class Asset {
     private String banner;
     private String imdbRating;
     private String rottenTomatoesRating;
-    private String plot;
+    @Lob private String plot;
     private String runtime;
     private String year;
     private Instant timestamp;
