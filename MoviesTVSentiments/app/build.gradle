@@ -113,6 +113,9 @@ dependencies {
     // Glide
     implementation "com.github.bumptech.glide:glide:4.11.0"
 
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+
     // Testing
     androidTestImplementation "androidx.test:rules:1.1.0"
     androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
@@ -124,4 +127,5 @@ dependencies {
     testImplementation "com.google.truth:truth:$rootProject.truthVersion"
     testImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
     androidTestImplementation "pl.pragmatists:JUnitParams:1.1.1"
+    testImplementation "pl.pragmatists:JUnitParams:1.1.1"
 }
