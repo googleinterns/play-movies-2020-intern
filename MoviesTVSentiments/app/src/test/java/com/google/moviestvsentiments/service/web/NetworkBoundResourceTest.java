@@ -31,8 +31,8 @@ public class NetworkBoundResourceTest {
 
     @Test
     @Parameters(method = "invokesCorrectMethodsParameters")
-    public void shouldFetchResult_invokesCorrectMethods(boolean shouldFetch,
-                                                        boolean[] expectedInvocations) {
+    public void networkBoundResource_invokesCorrectMethods(boolean shouldFetchReturnValue,
+                                                           boolean[] expectedInvocations) {
         final boolean[] invocations = {false, false, false, false};
         NetworkBoundResource resource = new NetworkBoundResource<String, String>() {
             @Override protected void saveCallResult(String item) {
@@ -41,7 +41,7 @@ public class NetworkBoundResourceTest {
 
             @Override protected boolean shouldFetch(String data) {
                 invocations[1] = true;
-                return shouldFetch;
+                return shouldFetchReturnValue;
             }
 
             @Override protected LiveData<String> loadFromRoom() {
@@ -62,13 +62,15 @@ public class NetworkBoundResourceTest {
 
     @Test
     public void networkBoundResource_passesCorrectParameters() {
+        final String[] shouldFetchParameter = new String[1];
+        final String[] saveCallResultParameter = new String[1];
         NetworkBoundResource resource = new NetworkBoundResource<String, String>() {
             @Override protected void saveCallResult(String item) {
-                assertThat(item).isEqualTo(SERVER_VALUE);
+                saveCallResultParameter[0] = item;
             }
 
             @Override protected boolean shouldFetch(String data) {
-                assertThat(data).isEqualTo(LOCAL_VALUE);
+                shouldFetchParameter[0] = data;
                 return true;
             }
 
@@ -82,6 +84,9 @@ public class NetworkBoundResourceTest {
         };
 
         resource.getResult().observeForever(data -> {});
+
+        assertThat(saveCallResultParameter[0]).isEqualTo(SERVER_VALUE);
+        assertThat(shouldFetchParameter[0]).isEqualTo(LOCAL_VALUE);
     }
 
     private Object[] returnsCorrectValueParameters() {
