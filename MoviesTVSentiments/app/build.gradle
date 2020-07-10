@@ -113,8 +113,11 @@ dependencies {
     // Glide
     implementation "com.github.bumptech.glide:glide:4.11.0"
 
-    // Retrofit
+    // Retrofit and Jackson
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.1'
 
     // Testing
     androidTestImplementation "androidx.test:rules:1.1.0"
