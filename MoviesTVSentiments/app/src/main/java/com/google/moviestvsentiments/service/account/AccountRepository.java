@@ -1,11 +1,15 @@
 package com.google.moviestvsentiments.service.account;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.service.web.ApiResponse;
 import com.google.moviestvsentiments.service.web.NetworkBoundResource;
 import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.service.web.WebService;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
 import javax.inject.Inject;
@@ -18,12 +22,14 @@ public class AccountRepository {
     private final AccountDao accountDao;
     private final Executor executor;
     private final WebService webService;
+    private final Clock clock;
 
     @Inject
-    AccountRepository(AccountDao accountDao, Executor executor, WebService webService) {
+    AccountRepository(AccountDao accountDao, Executor executor, WebService webService, Clock clock) {
         this.accountDao = accountDao;
         this.executor = executor;
         this.webService = webService;
+        this.clock = clock;
     }
 
     /**
@@ -34,18 +40,35 @@ public class AccountRepository {
      * @return A new AccountRepository object.
      */
     public static AccountRepository create(AccountDao accountDao, Executor executor,
-                                           WebService webService) {
-        return new AccountRepository(accountDao, executor, webService);
+                                           WebService webService, Clock clock) {
+        return new AccountRepository(accountDao, executor, webService, clock);
     }
 
     /**
-     * Adds the given account name into the accounts table. If the name already exists,
-     * it is ignored. The account record is created with is_current set to false.
+     * Adds the given account name into the accounts table. If the name already exists, the account
+     * will be updated. The account is first sent to the server. If the server saves the account
+     * successfully, then the account will be saved locally with isPending set to false. Otherwise,
+     * it will be saved locally with isPending set to true.
      * @param name The name of the account to add.
      */
     void addAccount(String name) {
-        executor.execute(() -> {
-            accountDao.addAccount(name);
+        List<Account> accountList = Arrays.asList(Account.builder().setName(name)
+                .setTimestamp(Instant.now(clock)).build());
+        LiveData<ApiResponse<List<Account>>> apiCall = webService.addAccounts(accountList);
+        apiCall.observeForever(new Observer<ApiResponse<List<Account>>>() {
+            @Override
+            public void onChanged(ApiResponse<List<Account>> response) {
+                apiCall.removeObserver(this);
+                if (response.isSuccessful()) {
+                    executor.execute(() -> {
+                        accountDao.addAccounts(response.getBody());
+                    });
+                } else {
+                    executor.execute(() -> {
+                        accountDao.addAccount(name, true);
+                    });
+                }
+            }
         });
     }
 

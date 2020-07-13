@@ -67,18 +67,10 @@ public class AccountControllerTest {
         when(mockRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(ACCOUNT_1, ACCOUNT_2));
 
         mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).content(ACCOUNT_LIST_JSON))
-                .andExpect(jsonPath("$.accounts[0].name", equalTo(ACCOUNT_1.getName())))
-                .andExpect(jsonPath("$.accounts[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
-                .andExpect(jsonPath("$.accounts[1].name", equalTo(ACCOUNT_2.getName())))
-                .andExpect(jsonPath("$.accounts[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
-    }
-
-    @Test
-    public void accountController_addAccountsSuccessful_returnsNullError() throws Exception {
-        when(mockRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(ACCOUNT_1, ACCOUNT_2));
-
-        mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).content(ACCOUNT_LIST_JSON))
-                .andExpect(jsonPath("$.error", equalTo(null)));
+                .andExpect(jsonPath("$[0].name", equalTo(ACCOUNT_1.getName())))
+                .andExpect(jsonPath("$[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
+                .andExpect(jsonPath("$[1].name", equalTo(ACCOUNT_2.getName())))
+                .andExpect(jsonPath("$[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
     }
 
     @Test
@@ -98,19 +90,11 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void accountController_addAccountsFailure_returnsNullList() throws Exception {
-        when(mockRepository.saveAll(any(Iterable.class))).thenThrow(JpaSystemException.class);
-
-        mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).content(ACCOUNT_LIST_JSON))
-                .andExpect(jsonPath("$.accounts", equalTo(null)));
-    }
-
-    @Test
     public void accountController_addAccountsFailure_returnsError() throws Exception {
         final String errorMessage = "Invalid account name";
         when(mockRepository.saveAll(any(Iterable.class))).thenThrow(new JpaSystemException(new RuntimeException(errorMessage)));
 
         mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).content(ACCOUNT_LIST_JSON))
-                .andExpect(jsonPath("$.error", containsString(errorMessage)));
+                .andExpect(jsonPath("$", containsString(errorMessage)));
     }
 }

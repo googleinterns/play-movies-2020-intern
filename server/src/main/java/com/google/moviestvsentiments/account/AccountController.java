@@ -38,17 +38,16 @@ public class AccountController {
      * @return A ResponseEntity with either the created accounts or the error message.
      */
     @PostMapping("/accounts")
-    public ResponseEntity<AddAccountResponse> addAccounts(@RequestBody List<Account> accounts) {
+    public ResponseEntity addAccounts(@RequestBody List<Account> accounts) {
         try {
             Iterable<Account> iterable = repository.saveAll(accounts);
             List<Account> savedAccounts = StreamSupport.stream(iterable.spliterator(), false)
                     .collect(Collectors.toList());
-            return ResponseEntity.ok().body(AddAccountResponse.create(savedAccounts, null));
+            return ResponseEntity.ok().body(savedAccounts);
         } catch (JpaSystemException e) {
-            return ResponseEntity.badRequest().body(AddAccountResponse.create(null, e.getMessage()));
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(AddAccountResponse.create(null, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }

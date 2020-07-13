@@ -25,5 +25,5 @@ public interface WebService {
      * @return The list of successfully added Accounts.
      */
     @POST("accounts")
-    LiveData<ApiResponse<Account>> addAccounts(@Body List<Account> accounts);
+    LiveData<ApiResponse<List<Account>>> addAccounts(@Body List<Account> accounts);
 }

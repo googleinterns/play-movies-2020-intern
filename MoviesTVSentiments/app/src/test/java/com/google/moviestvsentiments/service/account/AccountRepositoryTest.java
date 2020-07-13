@@ -19,7 +19,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import retrofit2.Response;
@@ -27,15 +29,8 @@ import retrofit2.Response;
 @RunWith(JUnit4.class)
 public class AccountRepositoryTest {
 
-    private static final Account ACCOUNT = createAccount("Account Name", Instant.ofEpochSecond(1337), true);
-
-    private static Account createAccount(String accountName, Instant timestamp, boolean isCurrent) {
-        Account account = new Account();
-        account.name = accountName;
-        account.timestamp = timestamp;
-        account.isCurrent = isCurrent;
-        return account;
-    }
+    private static final Account ACCOUNT = Account.builder().setName("Account Name")
+            .setTimestamp(Instant.EPOCH).build();
 
     @Rule
     public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();
@@ -48,14 +43,31 @@ public class AccountRepositoryTest {
     public void setUp() {
         dao = mock(AccountDao.class);
         webService = mock(WebService.class);
-        repository = AccountRepository.create(dao, new MainThreadDatabaseExecutor(), webService);
+        Clock clock = Clock.fixed(Instant.EPOCH, ZoneId.systemDefault());
+        repository = AccountRepository.create(dao, new MainThreadDatabaseExecutor(), webService, clock);
     }
 
     @Test
-    public void addAccount_invokesDao() {
-        repository.addAccount("Account Name");
+    public void addAccount_webServiceFailure_setsIsPendingTrue() {
+        MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
+                new ApiResponse(new RuntimeException("Network error")));
+        when(webService.addAccounts(Arrays.asList(ACCOUNT))).thenReturn(remoteData);
 
-        verify(dao).addAccount("Account Name");
+        repository.addAccount(ACCOUNT.name());
+
+        verify(dao).addAccount(ACCOUNT.name(), true);
+    }
+
+    @Test
+    public void addAccount_webServiceSuccess_setsIsPendingFalse() {
+        List<Account> remoteAccounts = Arrays.asList(ACCOUNT);
+        MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
+                new ApiResponse(Response.success(remoteAccounts)));
+        when(webService.addAccounts(Arrays.asList(ACCOUNT))).thenReturn(remoteData);
+
+        repository.addAccount(ACCOUNT.name());
+
+        verify(dao).addAccounts(remoteAccounts);
     }
 
     @Test
@@ -75,8 +87,8 @@ public class AccountRepositoryTest {
     @Test
     public void getAlphabetizedAccounts_webServiceSuccess_addsRemoteAccountsToDatabase() {
         MutableLiveData<List<Account>> localData = new MutableLiveData<>(Arrays.asList(ACCOUNT));
-        List<Account> remoteAccounts = Arrays.asList(createAccount("Remote Account",
-                Instant.ofEpochSecond(17), false));
+        List<Account> remoteAccounts = Arrays.asList(Account.builder().setName("Remote Account")
+                .setTimestamp(Instant.ofEpochSecond(17)).build());
         MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
                 new ApiResponse(Response.success(remoteAccounts)));
         when(dao.getAlphabetizedAccounts()).thenReturn(localData);
