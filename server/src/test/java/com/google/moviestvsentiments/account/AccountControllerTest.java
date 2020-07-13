@@ -29,6 +29,8 @@ public class AccountControllerTest {
     private static final Account ACCOUNT_2 = Account.create("Test Name 2", Instant.ofEpochSecond(1));
     private static final String ACCOUNT_LIST_JSON = "[ { \"name\": \"Test Name 1\", \"timestamp\": 0 }, " +
             "{\"name\": \"Test Name 2\", \"timestamp\": 1} ]";
+    private static final String ADD_ACCOUNT_URL = "/account?name=" + ACCOUNT_1.getName() + "&timestamp=" +
+            ACCOUNT_1.getTimestamp();
 
     @Autowired
     private MockMvc mockMvc;
@@ -47,6 +49,53 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
                 .andExpect(jsonPath("$[1].name", equalTo(ACCOUNT_2.getName())))
                 .andExpect(jsonPath("$[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
+    }
+
+    @Test
+    public void accountController_addAccount_invokesRepository() throws Exception {
+        mockMvc.perform(post(ADD_ACCOUNT_URL));
+
+        verify(mockRepository).save(ACCOUNT_1);
+    }
+
+    @Test
+    public void accountController_addAccountSuccessful_returnsOk() throws Exception {
+        mockMvc.perform(post(ADD_ACCOUNT_URL))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void accountController_addAccountSuccessful_returnsAccounts() throws Exception {
+        when(mockRepository.save(any(Account.class))).thenReturn(ACCOUNT_1);
+
+        mockMvc.perform(post(ADD_ACCOUNT_URL))
+                .andExpect(jsonPath("$.name", equalTo(ACCOUNT_1.getName())))
+                .andExpect(jsonPath("$.timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())));
+    }
+
+    @Test
+    public void accountController_addAccountJpaException_returnsBadRequest() throws Exception {
+        when(mockRepository.save(any(Account.class))).thenThrow(JpaSystemException.class);
+
+        mockMvc.perform(post(ADD_ACCOUNT_URL))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void accountController_addAccountOtherException_returnsServerError() throws Exception {
+        when(mockRepository.save(any(Account.class))).thenThrow(RuntimeException.class);
+
+        mockMvc.perform(post(ADD_ACCOUNT_URL))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void accountController_addAccountFailure_returnsError() throws Exception {
+        final String errorMessage = "Invalid account name";
+        when(mockRepository.save(any(Account.class))).thenThrow(new JpaSystemException(new RuntimeException(errorMessage)));
+
+        mockMvc.perform(post(ADD_ACCOUNT_URL))
+                .andExpect(jsonPath("$", containsString(errorMessage)));
     }
 
     @Test

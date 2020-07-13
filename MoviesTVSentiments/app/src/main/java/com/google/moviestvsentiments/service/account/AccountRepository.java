@@ -52,22 +52,16 @@ public class AccountRepository {
      * @param name The name of the account to add.
      */
     void addAccount(String name) {
-        List<Account> accountList = Arrays.asList(Account.builder().setName(name)
-                .setTimestamp(Instant.now(clock)).build());
-        LiveData<ApiResponse<List<Account>>> apiCall = webService.addAccounts(accountList);
-        apiCall.observeForever(new Observer<ApiResponse<List<Account>>>() {
+        Instant timestamp = Instant.now(clock);
+        LiveData<ApiResponse<Account>> apiCall = webService.addAccount(name, timestamp);
+        apiCall.observeForever(new Observer<ApiResponse<Account>>() {
             @Override
-            public void onChanged(ApiResponse<List<Account>> response) {
+            public void onChanged(ApiResponse<Account> response) {
                 apiCall.removeObserver(this);
-                if (response.isSuccessful()) {
-                    executor.execute(() -> {
-                        accountDao.addAccounts(response.getBody());
-                    });
-                } else {
-                    executor.execute(() -> {
-                        accountDao.addAccount(name, true);
-                    });
-                }
+                boolean isPending = !response.isSuccessful();
+                executor.execute(() -> {
+                    accountDao.addAccount(name, timestamp, isPending);
+                });
             }
         });
     }

@@ -6,6 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import com.google.moviestvsentiments.model.Account;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -18,10 +19,12 @@ public abstract class AccountDao {
      * Adds the given account name into the accounts table. If the name already exists,
      * it is ignored. The account record is created with is_current set to false.
      * @param name The name of the account to add.
+     * @param timestamp The timestamp of the account to add.
      * @param isPending Whether the account needs to be synced with the server or not.
      */
-    @Query("INSERT OR IGNORE INTO accounts_table (account_name, is_pending) VALUES (:name, :isPending)")
-    public abstract void addAccount(String name, boolean isPending);
+    @Query("INSERT OR IGNORE INTO accounts_table (account_name, timestamp, is_pending) " +
+            "VALUES (:name, :timestamp, :isPending)")
+    public abstract void addAccount(String name, Instant timestamp, boolean isPending);
 
     /**
      * Adds all of the given accounts into the accounts table. If any already exist, they are

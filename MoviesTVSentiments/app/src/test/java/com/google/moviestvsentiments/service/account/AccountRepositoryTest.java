@@ -49,25 +49,24 @@ public class AccountRepositoryTest {
 
     @Test
     public void addAccount_webServiceFailure_setsIsPendingTrue() {
-        MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
+        MutableLiveData<ApiResponse<Account>> remoteData = new MutableLiveData<>(
                 new ApiResponse(new RuntimeException("Network error")));
-        when(webService.addAccounts(Arrays.asList(ACCOUNT))).thenReturn(remoteData);
+        when(webService.addAccount(ACCOUNT.name(), Instant.EPOCH)).thenReturn(remoteData);
 
         repository.addAccount(ACCOUNT.name());
 
-        verify(dao).addAccount(ACCOUNT.name(), true);
+        verify(dao).addAccount(ACCOUNT.name(), Instant.EPOCH, true);
     }
 
     @Test
     public void addAccount_webServiceSuccess_setsIsPendingFalse() {
-        List<Account> remoteAccounts = Arrays.asList(ACCOUNT);
-        MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
-                new ApiResponse(Response.success(remoteAccounts)));
-        when(webService.addAccounts(Arrays.asList(ACCOUNT))).thenReturn(remoteData);
+        MutableLiveData<ApiResponse<Account>> remoteData = new MutableLiveData<>(
+                new ApiResponse(Response.success(ACCOUNT)));
+        when(webService.addAccount(ACCOUNT.name(), Instant.EPOCH)).thenReturn(remoteData);
 
         repository.addAccount(ACCOUNT.name());
 
-        verify(dao).addAccounts(remoteAccounts);
+        verify(dao).addAccount(ACCOUNT.name(), Instant.EPOCH, false);
     }
 
     @Test

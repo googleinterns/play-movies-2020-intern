@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import java.time.Instant;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
@@ -41,7 +42,7 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_returnsName() {
-        accountDao.addAccount("John Doe", false);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts.get(0).name()).isEqualTo("John Doe");
@@ -49,7 +50,7 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_returnsIsCurrent() {
-        accountDao.addAccount("John Doe", false);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts.get(0).isCurrent()).isFalse();
@@ -57,15 +58,16 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_returnsTimestamp() {
-        accountDao.addAccount("John Doe", false);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
-        assertThat(accounts.get(0).timestamp().getEpochSecond()).isGreaterThan(0);
+        assertThat(accounts.get(0).timestamp().getEpochSecond())
+                .isEqualTo(Instant.MAX.getEpochSecond());
     }
 
     @Test
     public void addAndGetAccount_returnsIsPending() {
-        accountDao.addAccount("John Doe", true);
+        accountDao.addAccount("John Doe", Instant.MAX, true);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts.get(0).isPending()).isTrue();
@@ -73,8 +75,8 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_multipleAccounts_returnsAllAccounts() {
-        accountDao.addAccount("John Doe", false);
-        accountDao.addAccount("Jane Doe", true);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
+        accountDao.addAccount("Jane Doe", Instant.MAX, true);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts).hasSize(2);
@@ -84,8 +86,8 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_duplicateAccount_returnsOneAccount() {
-        accountDao.addAccount("John Doe", false);
-        accountDao.addAccount("John Doe", false);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts).hasSize(1);
@@ -100,7 +102,7 @@ public class AccountDaoTest {
 
     @Test
     public void setIsCurrent_existingAccount_returnsTrue() {
-        accountDao.addAccount("Existing Account", false);
+        accountDao.addAccount("Existing Account", Instant.MAX, false);
 
         boolean updated = accountDao.setIsCurrent("Existing Account", false);
 
@@ -116,7 +118,7 @@ public class AccountDaoTest {
 
     @Test
     public void getCurrentAccount_withCurrentSet_returnsAccount() {
-        accountDao.addAccount("John Doe", false);
+        accountDao.addAccount("John Doe", Instant.MAX, false);
         accountDao.setIsCurrent("John Doe", true);
 
         Account account = LiveDataTestUtil.getValue(accountDao.getCurrentAccount());
