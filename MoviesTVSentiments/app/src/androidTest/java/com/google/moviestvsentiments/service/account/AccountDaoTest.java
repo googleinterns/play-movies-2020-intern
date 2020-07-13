@@ -60,7 +60,7 @@ public class AccountDaoTest {
         accountDao.addAccount("John Doe");
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
-        assertThat(accounts.get(0).timestamp).isGreaterThan(0);
+        assertThat(accounts.get(0).timestamp.getEpochSecond()).isGreaterThan(0);
     }
 
     @Test

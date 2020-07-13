@@ -17,7 +17,7 @@ public abstract class NetworkBoundResource<ServerType, LocalType> {
      * Constructs a NetworkBoundResource that observes the local Room value for changes that
      * may or may not trigger a network request.
      */
-    NetworkBoundResource() {
+    public NetworkBoundResource() {
         result.setValue(Resource.loading(null));
         LiveData<LocalType> dbSource = loadFromRoom();
         result.addSource(dbSource, data -> {

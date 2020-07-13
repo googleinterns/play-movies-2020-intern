@@ -27,8 +27,8 @@ public class AccountControllerTest {
 
     private static final Account ACCOUNT_1 = Account.create("Test Name 1", Instant.ofEpochSecond(0));
     private static final Account ACCOUNT_2 = Account.create("Test Name 2", Instant.ofEpochSecond(1));
-    private static final String ACCOUNT_LIST_JSON = "[ { \"accountName\": \"Test Name 1\", \"timestamp\": 0 }, " +
-            "{\"accountName\": \"Test Name 2\", \"timestamp\": 1} ]";
+    private static final String ACCOUNT_LIST_JSON = "[ { \"name\": \"Test Name 1\", \"timestamp\": 0 }, " +
+            "{\"name\": \"Test Name 2\", \"timestamp\": 1} ]";
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,9 +43,9 @@ public class AccountControllerTest {
         mockMvc.perform(get("/accounts"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].accountName", equalTo(ACCOUNT_1.getAccountName())))
+                .andExpect(jsonPath("$[0].name", equalTo(ACCOUNT_1.getName())))
                 .andExpect(jsonPath("$[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
-                .andExpect(jsonPath("$[1].accountName", equalTo(ACCOUNT_2.getAccountName())))
+                .andExpect(jsonPath("$[1].name", equalTo(ACCOUNT_2.getName())))
                 .andExpect(jsonPath("$[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
     }
 
@@ -67,9 +67,9 @@ public class AccountControllerTest {
         when(mockRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(ACCOUNT_1, ACCOUNT_2));
 
         mockMvc.perform(post("/accounts").contentType(MediaType.APPLICATION_JSON).content(ACCOUNT_LIST_JSON))
-                .andExpect(jsonPath("$.accounts[0].accountName", equalTo(ACCOUNT_1.getAccountName())))
+                .andExpect(jsonPath("$.accounts[0].name", equalTo(ACCOUNT_1.getName())))
                 .andExpect(jsonPath("$.accounts[0].timestamp", equalTo(ACCOUNT_1.getTimestamp().toString())))
-                .andExpect(jsonPath("$.accounts[1].accountName", equalTo(ACCOUNT_2.getAccountName())))
+                .andExpect(jsonPath("$.accounts[1].name", equalTo(ACCOUNT_2.getName())))
                 .andExpect(jsonPath("$.accounts[1].timestamp", equalTo(ACCOUNT_2.getTimestamp().toString())));
     }
 

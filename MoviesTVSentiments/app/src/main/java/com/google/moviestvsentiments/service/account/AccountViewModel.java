@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.service.account;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import com.google.moviestvsentiments.model.Account;
+import com.google.moviestvsentiments.service.web.Resource;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -39,7 +40,7 @@ public class AccountViewModel extends ViewModel {
     /**
      * Returns a LiveData list of all accounts sorted by name in alphabetical order.
      */
-    public LiveData<List<Account>> getAlphabetizedAccounts() {
+    public LiveData<Resource<List<Account>>> getAlphabetizedAccounts() {
         return repository.getAlphabetizedAccounts();
     }
 
