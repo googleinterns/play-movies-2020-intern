@@ -2,12 +2,16 @@ package com.google.moviestvsentiments.service.account;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 import com.google.moviestvsentiments.model.Account;
+import com.google.moviestvsentiments.service.web.ApiResponse;
+import com.google.moviestvsentiments.service.web.Resource;
+import com.google.moviestvsentiments.service.web.WebService;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import com.google.moviestvsentiments.util.MainThreadDatabaseExecutor;
 import org.junit.Before;
@@ -15,15 +19,17 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import retrofit2.Response;
 
 @RunWith(JUnit4.class)
 public class AccountRepositoryTest {
 
-    private static final Account ACCOUNT = createAccount("Account Name", 1337, true);
+    private static final Account ACCOUNT = createAccount("Account Name", Instant.ofEpochSecond(1337), true);
 
-    private static Account createAccount(String accountName, long timestamp, boolean isCurrent) {
+    private static Account createAccount(String accountName, Instant timestamp, boolean isCurrent) {
         Account account = new Account();
         account.name = accountName;
         account.timestamp = timestamp;
@@ -36,11 +42,13 @@ public class AccountRepositoryTest {
 
     private AccountDao dao;
     private AccountRepository repository;
+    private WebService webService;
 
     @Before
     public void setUp() {
         dao = mock(AccountDao.class);
-        repository = AccountRepository.create(dao, new MainThreadDatabaseExecutor());
+        webService = mock(WebService.class);
+        repository = AccountRepository.create(dao, new MainThreadDatabaseExecutor(), webService);
     }
 
     @Test
@@ -51,14 +59,33 @@ public class AccountRepositoryTest {
     }
 
     @Test
-    public void getAlphabetizedAccounts_returnsAccounts() {
-        MutableLiveData<List<Account>> accountsData = new MutableLiveData<>();
-        accountsData.setValue(Arrays.asList(ACCOUNT));
-        when(dao.getAlphabetizedAccounts()).thenReturn(accountsData);
+    public void getAlphabetizedAccounts_webServiceFailure_returnsLocalAccounts() {
+        MutableLiveData<List<Account>> localData = new MutableLiveData<>(Arrays.asList(ACCOUNT));
+        MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
+                new ApiResponse(new RuntimeException("Network error")));
+        when(dao.getAlphabetizedAccounts()).thenReturn(localData);
+        when(webService.getAlphabetizedAccounts()).thenReturn(remoteData);
 
-        List<Account> results = LiveDataTestUtil.getValue(repository.getAlphabetizedAccounts());
+        Resource<List<Account>> results = LiveDataTestUtil.getValue(repository.getAlphabetizedAccounts());
 
-        assertThat(results).containsExactly(ACCOUNT);
+        assertThat(results.getStatus()).isEqualTo(Resource.Status.ERROR);
+        assertThat(results.getValue()).containsExactly(ACCOUNT);
+    }
+
+    @Test
+    public void getAlphabetizedAccounts_webServiceSuccess_addsRemoteAccountsToDatabase() {
+        MutableLiveData<List<Account>> localData = new MutableLiveData<>(Arrays.asList(ACCOUNT));
+        List<Account> remoteAccounts = Arrays.asList(createAccount("Remote Account",
+                Instant.ofEpochSecond(17), false));
+        MutableLiveData<ApiResponse<List<Account>>> remoteData = new MutableLiveData<>(
+                new ApiResponse(Response.success(remoteAccounts)));
+        when(dao.getAlphabetizedAccounts()).thenReturn(localData);
+        when(webService.getAlphabetizedAccounts()).thenReturn(remoteData);
+
+        Resource<List<Account>> results = LiveDataTestUtil.getValue(repository.getAlphabetizedAccounts());
+
+        assertThat(results.getStatus()).isEqualTo(Resource.Status.SUCCESS);
+        verify(dao, times(1)).addAccounts(remoteAccounts);
     }
 
     @Test

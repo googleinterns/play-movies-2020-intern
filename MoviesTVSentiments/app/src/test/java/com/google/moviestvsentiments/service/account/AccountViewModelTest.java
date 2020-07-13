@@ -8,21 +8,23 @@ import static org.mockito.Mockito.when;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.lifecycle.MutableLiveData;
 import com.google.moviestvsentiments.model.Account;
+import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
 @RunWith(JUnit4.class)
 public class AccountViewModelTest {
 
-    private static final Account ACCOUNT = createAccount("Account Name", 13, true);
+    private static final Account ACCOUNT = createAccount("Account Name", Instant.ofEpochSecond(13), true);
 
-    private static Account createAccount(String accountName, long timestamp, boolean isCurrent) {
+    private static Account createAccount(String accountName, Instant timestamp, boolean isCurrent) {
         Account account = new Account();
         account.name = accountName;
         account.timestamp = timestamp;
@@ -51,13 +53,13 @@ public class AccountViewModelTest {
 
     @Test
     public void getAlphabetizedAccounts_returnsAccounts() {
-        MutableLiveData<List<Account>> accountsData = new MutableLiveData<>();
-        accountsData.setValue(Arrays.asList(ACCOUNT));
+        MutableLiveData<Resource<List<Account>>> accountsData = new MutableLiveData<>();
+        accountsData.setValue(Resource.success(Arrays.asList(ACCOUNT)));
         when(repository.getAlphabetizedAccounts()).thenReturn(accountsData);
 
-        List<Account> results = LiveDataTestUtil.getValue(viewModel.getAlphabetizedAccounts());
+        Resource<List<Account>> resource = LiveDataTestUtil.getValue(viewModel.getAlphabetizedAccounts());
 
-        assertThat(results).containsExactly(ACCOUNT);
+        assertThat(resource.getValue()).containsExactly(ACCOUNT);
     }
 
     @Test

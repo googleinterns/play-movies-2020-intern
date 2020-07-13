@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import java.time.Instant;
 
 /**
  * A record in the accounts database table.
@@ -18,7 +19,7 @@ public class Account {
 
     @NonNull
     @ColumnInfo(name = "timestamp", defaultValue = "CURRENT_TIMESTAMP")
-    public long timestamp;
+    public Instant timestamp;
 
     @NonNull
     @ColumnInfo(name = "is_current", defaultValue = "0")

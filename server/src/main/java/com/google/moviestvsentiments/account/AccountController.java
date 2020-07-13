@@ -27,7 +27,7 @@ public class AccountController {
      */
     @GetMapping("/accounts")
     public List<Account> getAccounts() {
-        Iterable<Account> accounts = repository.findAll(Sort.by("accountName"));
+        Iterable<Account> accounts = repository.findAll(Sort.by("name"));
         return StreamSupport.stream(accounts.spliterator(), false).collect(Collectors.toList());
     }
 

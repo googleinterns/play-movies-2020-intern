@@ -16,7 +16,7 @@ import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentDao;
  */
 @Database(entities = {Account.class, Asset.class, UserSentiment.class}, version = 1,
         exportSchema = false)
-@TypeConverters({AssetType.class, SentimentType.class})
+@TypeConverters({AssetType.class, SentimentType.class, SentimentsTypeConverters.class})
 public abstract class SentimentsDatabase extends RoomDatabase {
 
     /**

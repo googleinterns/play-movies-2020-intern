@@ -2,6 +2,8 @@ package com.google.moviestvsentiments.service.account;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import com.google.moviestvsentiments.model.Account;
 import java.util.List;
@@ -19,6 +21,14 @@ public abstract class AccountDao {
      */
     @Query("INSERT OR IGNORE INTO accounts_table (account_name) VALUES (:name)")
     public abstract void addAccount(String name);
+
+    /**
+     * Adds all of the given accounts into the accounts table. If any already exist, they are
+     * replaced.
+     * @param accounts The accounts to insert into the table.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void addAccounts(List<Account> accounts);
 
     /**
      * Returns a LiveData list of all accounts in alphabetical order.

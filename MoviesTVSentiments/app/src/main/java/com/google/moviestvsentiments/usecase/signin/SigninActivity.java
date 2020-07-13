@@ -1,18 +1,15 @@
 package com.google.moviestvsentiments.usecase.signin;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import com.google.moviestvsentiments.R;
-import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.service.account.AccountViewModel;
 import com.google.moviestvsentiments.usecase.addAccount.AddAccountActivity;
 import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActivity;
 import dagger.hilt.android.AndroidEntryPoint;
-import java.util.List;
 import javax.inject.Inject;
 
 /**
@@ -49,8 +46,10 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
         accountList.setAdapter(adapter);
         accountList.setLayoutManager(new LinearLayoutManager(this));
 
-        viewModel.getAlphabetizedAccounts().observe(this, accounts -> {
-            adapter.setAccounts(accounts);
+        viewModel.getAlphabetizedAccounts().observe(this, resource -> {
+            if (resource.getValue() != null) {
+                adapter.setAccounts(resource.getValue());
+            }
         });
     }
 

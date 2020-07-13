@@ -12,40 +12,40 @@ import java.util.Objects;
 public class Account {
     
     @Id
-    private String accountName;
+    private String name;
     private Instant timestamp;
 
     // The default constructor is required by the Spring JPA.
     protected Account() {}
 
-    private Account(String accountName, Instant timestamp) {
-        this.accountName = accountName;
+    private Account(String name, Instant timestamp) {
+        this.name = name;
         this.timestamp = timestamp;
     }
 
     /**
      * Creates a new Account with the given name and timestamp.
-     * @param accountName The name for the new account.
+     * @param name The name for the new account.
      * @param timestamp The timestamp for the new account.
      * @return A new Account with the given name and timestamp.
      */
-    public static Account create(String accountName, Instant timestamp) {
-        return new Account(accountName, timestamp);
+    public static Account create(String name, Instant timestamp) {
+        return new Account(name, timestamp);
     }
 
     /**
      * Returns the account name.
      */
-    public String getAccountName() {
-        return accountName;
+    public String getName() {
+        return name;
     }
 
     /**
      * Sets the account name.
-     * @param accountName The new name for the account.
+     * @param name The new name for the account.
      */
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -69,11 +69,11 @@ public class Account {
         if (o == null || getClass() != o.getClass()) return false;
         Account account = (Account) o;
         return timestamp.equals(account.timestamp) &&
-                accountName.equals(account.accountName);
+                name.equals(account.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(accountName, timestamp);
+        return Objects.hash(name, timestamp);
     }
 }
