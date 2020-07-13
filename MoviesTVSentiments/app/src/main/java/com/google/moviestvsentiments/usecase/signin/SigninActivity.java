@@ -34,7 +34,7 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
         viewModel.getCurrentAccount().observe(this, account -> {
             if (account != null) {
                 Intent intent = new Intent(this, SentimentsNavigationActivity.class);
-                intent.putExtra(EXTRA_ACCOUNT_NAME, account.name);
+                intent.putExtra(EXTRA_ACCOUNT_NAME, account.name());
                 startActivity(intent);
                 finish();
             }

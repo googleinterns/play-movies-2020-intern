@@ -22,15 +22,8 @@ import java.util.List;
 @RunWith(JUnit4.class)
 public class AccountViewModelTest {
 
-    private static final Account ACCOUNT = createAccount("Account Name", Instant.ofEpochSecond(13), true);
-
-    private static Account createAccount(String accountName, Instant timestamp, boolean isCurrent) {
-        Account account = new Account();
-        account.name = accountName;
-        account.timestamp = timestamp;
-        account.isCurrent = isCurrent;
-        return account;
-    }
+    private static final Account ACCOUNT = Account.builder().setName("Account Name")
+            .setTimestamp(Instant.ofEpochSecond(13)).setIsCurrent(true).build();
 
     @Rule
     public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();

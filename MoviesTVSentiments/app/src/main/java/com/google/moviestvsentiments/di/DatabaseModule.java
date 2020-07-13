@@ -6,6 +6,7 @@ import com.google.moviestvsentiments.service.account.AccountDao;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentDao;
 import com.google.moviestvsentiments.service.database.AsyncDatabaseExecutor;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
+import java.time.Clock;
 import java.util.concurrent.Executor;
 import javax.inject.Singleton;
 import dagger.Module;
@@ -60,5 +61,14 @@ public class DatabaseModule {
     @Singleton
     public Executor provideDatabaseExecutor() {
         return AsyncDatabaseExecutor.create();
+    }
+
+    /**
+     * Returns the Clock object for use in setting timestamps.
+     */
+    @Provides
+    @Singleton
+    public Clock provideClock() {
+        return Clock.systemUTC();
     }
 }

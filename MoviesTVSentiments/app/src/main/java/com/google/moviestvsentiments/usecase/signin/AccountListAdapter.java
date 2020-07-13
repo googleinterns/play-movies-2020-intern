@@ -100,7 +100,7 @@ class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.Account
     @Override
     public void onBindViewHolder(AccountViewHolder holder, int position) {
         if (position < accounts.size()) {
-            holder.bind(false, accounts.get(position).name);
+            holder.bind(false, accounts.get(position).name());
         } else {
             holder.bind(true, "Add Account");
         }
