@@ -14,6 +14,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.rule.ActivityTestRule;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
+import com.google.moviestvsentiments.di.WebModule;
 import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
@@ -34,7 +35,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @HiltAndroidTest
-@UninstallModules(DatabaseModule.class)
+@UninstallModules({DatabaseModule.class, WebModule.class})
 @RunWith(JUnitParamsRunner.class)
 public class DetailsActivityTest {
 

@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.model;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import java.time.Instant;
 
 /**
  * A record in the user sentiments database table
@@ -29,5 +30,5 @@ public class UserSentiment {
 
     @NonNull
     @ColumnInfo(name = "timestamp", defaultValue = "CURRENT_TIMESTAMP")
-    public long timestamp;
+    public Instant timestamp;
 }

@@ -5,7 +5,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import java.time.Instant;
 
 /**
  * A record in the assets database table.
@@ -35,7 +38,7 @@ public abstract class Asset implements Parcelable {
     public abstract String poster();
 
     @AutoValue.CopyAnnotations
-    @NonNull
+    @Nullable
     @ColumnInfo(name = "banner")
     public abstract String banner();
 
@@ -57,7 +60,7 @@ public abstract class Asset implements Parcelable {
     @AutoValue.CopyAnnotations
     @NonNull
     @ColumnInfo(name = "timestamp", defaultValue = "CURRENT_TIMESTAMP")
-    public abstract long timestamp();
+    public abstract Instant timestamp();
 
     @AutoValue.CopyAnnotations
     @Nullable
@@ -70,13 +73,22 @@ public abstract class Asset implements Parcelable {
     public abstract String rottenTomatoesRating();
 
     /**
-     * Creates a new Asset object with the given fields. Room needs this factory method to create
-     * Asset objects. Other code should use the builder() method instead of this method.
+     * Creates a new Asset object with the given fields. Room and Jackson need this factory method
+     * to create Asset objects. Other code should use the builder() method instead of this method.
      * @return A new Asset object with the specified fields.
      */
-    public static Asset create(String id, AssetType type, String title, String poster,
-           String banner, String plot, String runtime, String year, long timestamp,
-           String imdbRating, String rottenTomatoesRating) {
+    @JsonCreator
+    public static Asset create(@JsonProperty("assetId") String id,
+                               @JsonProperty("assetType") AssetType type,
+                               @JsonProperty("title") String title,
+                               @JsonProperty("poster") String poster,
+                               @JsonProperty("banner") String banner,
+                               @JsonProperty("plot") String plot,
+                               @JsonProperty("runtime") String runtime,
+                               @JsonProperty("year") String year,
+                               @JsonProperty("timestamp") Instant timestamp,
+                               @JsonProperty("imdbRating") String imdbRating,
+                               @JsonProperty("rottenTomatoesRating") String rottenTomatoesRating) {
         return Asset.builder().setId(id).setType(type).setTitle(title).setPoster(poster)
                 .setBanner(banner).setPlot(plot).setRuntime(runtime).setYear(year)
                 .setTimestamp(timestamp).setImdbRating(imdbRating)
@@ -100,7 +112,7 @@ public abstract class Asset implements Parcelable {
         public abstract Builder setPlot(String value);
         public abstract Builder setRuntime(String value);
         public abstract Builder setYear(String value);
-        public abstract Builder setTimestamp(long value);
+        public abstract Builder setTimestamp(Instant value);
         public abstract Builder setImdbRating(String value);
         public abstract Builder setRottenTomatoesRating(String value);
         public abstract Asset build();

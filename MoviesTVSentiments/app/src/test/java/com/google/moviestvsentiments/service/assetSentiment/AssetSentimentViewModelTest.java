@@ -11,6 +11,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.util.AssetUtil;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
 import org.junit.Before;
@@ -60,15 +61,18 @@ public class AssetSentimentViewModelTest {
 
     @Test
     public void getAssets_returnsAssets() {
-        MutableLiveData<List<AssetSentiment>> assetData = new MutableLiveData<>();
-        assetData.setValue(Arrays.asList(AssetSentiment.create(ASSET, SentimentType.UNSPECIFIED)));
+        MutableLiveData<Resource<List<AssetSentiment>>> assetData = new MutableLiveData<>();
+        assetData.setValue(Resource.success(Arrays.asList(
+                AssetSentiment.create(ASSET, SentimentType.UNSPECIFIED))));
         when(repository.getAssets(AssetType.SHOW, "Account Name", SentimentType.UNSPECIFIED))
                 .thenReturn(assetData);
 
-        List<AssetSentiment> result = LiveDataTestUtil.getValue(viewModel.getAssets(AssetType.SHOW,
-                "Account Name", SentimentType.UNSPECIFIED));
+        Resource<List<AssetSentiment>> result = LiveDataTestUtil.getValue(viewModel.getAssets(
+                AssetType.SHOW, "Account Name", SentimentType.UNSPECIFIED));
 
-        assertThat(result).containsExactly(AssetSentiment.create(ASSET, SentimentType.UNSPECIFIED));
+        assertThat(result.getStatus()).isEqualTo(Resource.Status.SUCCESS);
+        assertThat(result.getValue()).containsExactly(AssetSentiment.create(ASSET,
+                SentimentType.UNSPECIFIED));
     }
 
     @Test

@@ -25,10 +25,11 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
+import com.google.moviestvsentiments.di.WebModule;
 import com.google.moviestvsentiments.usecase.addAccount.AddAccountActivity;
 import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActivity;
 
-@UninstallModules(DatabaseModule.class)
+@UninstallModules({DatabaseModule.class, WebModule.class})
 @HiltAndroidTest
 public class SigninActivityTest {
 

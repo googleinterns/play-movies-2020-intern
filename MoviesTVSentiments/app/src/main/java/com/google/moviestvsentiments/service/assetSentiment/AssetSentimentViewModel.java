@@ -6,6 +6,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.service.web.Resource;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -63,8 +64,8 @@ public class AssetSentimentViewModel extends ViewModel {
      * @return A LiveData list of AssetSentiments with reactions matching the given account
      * name and sentiment type.
      */
-    public LiveData<List<AssetSentiment>> getAssets(AssetType assetType, String accountName,
-                                                    SentimentType sentimentType) {
+    public LiveData<Resource<List<AssetSentiment>>> getAssets(AssetType assetType,
+                                                  String accountName, SentimentType sentimentType) {
         return repository.getAssets(assetType, accountName, sentimentType);
     }
 
