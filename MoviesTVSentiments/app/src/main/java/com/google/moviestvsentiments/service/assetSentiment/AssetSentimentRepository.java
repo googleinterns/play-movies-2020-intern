@@ -5,6 +5,10 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.service.web.ApiResponse;
+import com.google.moviestvsentiments.service.web.NetworkBoundResource;
+import com.google.moviestvsentiments.service.web.Resource;
+import com.google.moviestvsentiments.service.web.WebService;
 import java.util.List;
 import java.util.concurrent.Executor;
 import javax.inject.Inject;
@@ -16,22 +20,26 @@ public class AssetSentimentRepository {
 
     private final AssetSentimentDao assetSentimentDao;
     private final Executor executor;
+    private final WebService webService;
 
     @Inject
-    AssetSentimentRepository(AssetSentimentDao assetSentimentDao, Executor executor) {
+    AssetSentimentRepository(AssetSentimentDao assetSentimentDao, Executor executor,
+                             WebService webService) {
         this.assetSentimentDao = assetSentimentDao;
         this.executor = executor;
+        this.webService = webService;
     }
 
     /**
      * Returns a new AssetSentimentRepository.
      * @param assetSentimentDao The Dao object to use when accessing the local database.
      * @param executor The Executor to use when writing to the database.
+     * @param webService The WebService to use when fetching from the server.
      * @return A new AssetSentimentRepository object.
      */
     public static AssetSentimentRepository create(AssetSentimentDao assetSentimentDao,
-                                                  Executor executor) {
-        return new AssetSentimentRepository(assetSentimentDao, executor);
+                                                  Executor executor, WebService webService) {
+        return new AssetSentimentRepository(assetSentimentDao, executor, webService);
     }
 
     /**
@@ -61,16 +69,44 @@ public class AssetSentimentRepository {
     /**
      * Returns a LiveData list of AssetSentiments matching the given type that have been reacted to
      * with the given sentiment by the given account. If the sentiment type is UNSPECIFIED, assets
-     * with no corresponding user sentiment record will also be returned.
+     * with no corresponding user sentiment record will also be returned. The AssetSentiment list
+     * is pulled from the server and cached locally in the Room database.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking assets for sentiments.
      * @param sentimentType The sentiment type to check for.
      * @return A LiveData list of AssetSentiments with reactions matching the given account
      * name and sentiment type.
      */
-    LiveData<List<AssetSentiment>> getAssets(AssetType assetType, String accountName,
-                                                    SentimentType sentimentType) {
-        return assetSentimentDao.getAssets(assetType, accountName, sentimentType);
+    LiveData<Resource<List<AssetSentiment>>> getAssets(AssetType assetType, String accountName,
+                                                       SentimentType sentimentType) {
+        return new NetworkBoundResource<List<AssetSentiment>, List<AssetSentiment>>() {
+            @Override
+            protected void saveCallResult(List<AssetSentiment> assetSentiments) {
+                executor.execute(() -> {
+                    for (AssetSentiment assetSentiment : assetSentiments) {
+                        Asset asset = assetSentiment.asset();
+                        assetSentimentDao.addAsset(asset);
+                        assetSentimentDao.updateSentiment(accountName, asset.id(), assetType,
+                                assetSentiment.sentimentType());
+                    }
+                });
+            }
+
+            @Override
+            protected boolean shouldFetch(List<AssetSentiment> data) {
+                return true;
+            }
+
+            @Override
+            protected LiveData<List<AssetSentiment>> loadFromRoom() {
+                return assetSentimentDao.getAssets(assetType, accountName, sentimentType);
+            }
+
+            @Override
+            protected LiveData<ApiResponse<List<AssetSentiment>>> performNetworkCall() {
+                return webService.getAssets(assetType, accountName, sentimentType);
+            }
+        }.getResult();
     }
 
     /**

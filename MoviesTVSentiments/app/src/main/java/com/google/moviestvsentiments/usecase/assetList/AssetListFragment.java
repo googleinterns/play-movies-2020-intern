@@ -42,10 +42,20 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
         accountName = getActivity().getIntent().getStringExtra(SigninActivity.EXTRA_ACCOUNT_NAME);
         SentimentType sentimentType = AssetListFragmentArgs.fromBundle(getArguments())
                 .getSentimentType();
+
         viewModel.getAssets(AssetType.MOVIE, accountName, sentimentType)
-                .observe(getViewLifecycleOwner(), movies -> assetListScreen.setMovies(movies));
+            .observe(getViewLifecycleOwner(), moviesResource -> {
+                if (moviesResource.getValue() != null) {
+                    assetListScreen.setMovies(moviesResource.getValue());
+                }
+            });
+
         viewModel.getAssets(AssetType.SHOW, accountName, sentimentType)
-                .observe(getViewLifecycleOwner(), shows -> assetListScreen.setShows(shows));
+            .observe(getViewLifecycleOwner(), showsResource -> {
+                if (showsResource.getValue() != null) {
+                    assetListScreen.setShows(showsResource.getValue());
+                }
+            });
 
         return root;
     }

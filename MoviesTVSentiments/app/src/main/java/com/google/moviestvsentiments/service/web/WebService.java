@@ -2,6 +2,9 @@ package com.google.moviestvsentiments.service.web;
 
 import androidx.lifecycle.LiveData;
 import com.google.moviestvsentiments.model.Account;
+import com.google.moviestvsentiments.model.AssetSentiment;
+import com.google.moviestvsentiments.model.AssetType;
+import com.google.moviestvsentiments.model.SentimentType;
 import java.time.Instant;
 import java.util.List;
 import retrofit2.http.Body;
@@ -39,4 +42,17 @@ public interface WebService {
      */
     @POST("accounts")
     LiveData<ApiResponse<List<Account>>> addAccounts(@Body List<Account> accounts);
+
+    /**
+     * Returns a LiveData list of AssetSentiments that match the given AssetType, account name
+     * and SentimentType.
+     * @param assetType The type of Asset to match.
+     * @param accountName The name of the account to use when checking for user sentiments.
+     * @param sentimentType The type of user sentiment to match.
+     * @return A LiveData list of matching AssetSentiments.
+     */
+    @GET("assets")
+    LiveData<ApiResponse<List<AssetSentiment>>> getAssets(@Query("assetType") AssetType assetType,
+                                              @Query("accountName") String accountName,
+                                              @Query("sentimentType") SentimentType sentimentType);
 }

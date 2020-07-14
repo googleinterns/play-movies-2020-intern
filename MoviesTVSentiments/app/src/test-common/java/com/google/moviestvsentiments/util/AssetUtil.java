@@ -2,6 +2,7 @@ package com.google.moviestvsentiments.util;
 
 import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetType;
+import java.time.Instant;
 
 /**
  * AssetUtil provides helper functions for working with Asset objects.
@@ -38,7 +39,8 @@ public class AssetUtil {
     public static Asset createShowAsset(String assetId) {
         return Asset.builder().setId(assetId).setType(AssetType.SHOW).setTitle("assetTitle")
                 .setPoster("posterURL").setBanner("bannerURL").setYear("year")
-                .setPlot("plotDescription").setRuntime("runtime").setTimestamp(1).build();
+                .setPlot("plotDescription").setRuntime("runtime").setTimestamp(Instant.EPOCH)
+                .build();
     }
 
     /**
@@ -49,6 +51,6 @@ public class AssetUtil {
     public static Asset.Builder defaultMovieBuilder(String assetId) {
         return Asset.builder().setId(assetId).setType(AssetType.MOVIE).setTitle("assetTitle")
                 .setPoster("posterURL").setBanner("bannerURL").setPlot("plotDescription")
-                .setRuntime("runtime").setYear("year").setTimestamp(1);
+                .setRuntime("runtime").setYear("year").setTimestamp(Instant.EPOCH);
     }
 }

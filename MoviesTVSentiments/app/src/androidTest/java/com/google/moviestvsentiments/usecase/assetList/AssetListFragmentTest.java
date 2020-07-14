@@ -17,6 +17,7 @@ import androidx.test.espresso.intent.Intents;
 import com.google.moviestvsentiments.HiltTestActivity;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
+import com.google.moviestvsentiments.di.WebModule;
 import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
@@ -37,7 +38,7 @@ import com.google.moviestvsentiments.usecase.details.DetailsActivity;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import com.google.moviestvsentiments.util.AssetUtil;
 
-@UninstallModules(DatabaseModule.class)
+@UninstallModules({DatabaseModule.class, WebModule.class})
 @HiltAndroidTest
 @RunWith(JUnitParamsRunner.class)
 public class AssetListFragmentTest {
