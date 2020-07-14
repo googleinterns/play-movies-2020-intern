@@ -10,6 +10,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,12 +128,14 @@ public abstract class AssetSentimentDao {
      * @param assetId The id of the asset that the user sentiment is associated with.
      * @param assetType The type of the asset that the user sentiment is associated with.
      * @param sentimentType The type of the new user sentiment.
+     * @param isPending Whether the user sentiment needs to be synced with the server or not.
+     * @param timestamp The timestamp of the user sentiment.
      */
     @Query("INSERT OR REPLACE INTO user_sentiments_table " +
-            "(asset_id, account_name, asset_type, sentiment_type) " +
-            "VALUES (:assetId, :accountName, :assetType, :sentimentType)")
+            "(asset_id, account_name, asset_type, sentiment_type, is_pending, timestamp) " +
+            "VALUES (:assetId, :accountName, :assetType, :sentimentType, :isPending, :timestamp)")
     public abstract void updateSentiment(String accountName, String assetId, AssetType assetType,
-                                         SentimentType sentimentType);
+                                 SentimentType sentimentType, boolean isPending, Instant timestamp);
 
     /**
      * Deletes all user sentiments corresponding to the given account name.

@@ -1,14 +1,18 @@
 package com.google.moviestvsentiments.service.assetSentiment;
 
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.model.UserSentiment;
 import com.google.moviestvsentiments.service.web.ApiResponse;
 import com.google.moviestvsentiments.service.web.NetworkBoundResource;
 import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.service.web.WebService;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
 import javax.inject.Inject;
@@ -21,13 +25,15 @@ public class AssetSentimentRepository {
     private final AssetSentimentDao assetSentimentDao;
     private final Executor executor;
     private final WebService webService;
+    private final Clock clock;
 
     @Inject
     AssetSentimentRepository(AssetSentimentDao assetSentimentDao, Executor executor,
-                             WebService webService) {
+                             WebService webService, Clock clock) {
         this.assetSentimentDao = assetSentimentDao;
         this.executor = executor;
         this.webService = webService;
+        this.clock = clock;
     }
 
     /**
@@ -35,11 +41,12 @@ public class AssetSentimentRepository {
      * @param assetSentimentDao The Dao object to use when accessing the local database.
      * @param executor The Executor to use when writing to the database.
      * @param webService The WebService to use when fetching from the server.
+     * @param clock The clock to use when generating UserSentiment timestamps.
      * @return A new AssetSentimentRepository object.
      */
     public static AssetSentimentRepository create(AssetSentimentDao assetSentimentDao,
-                                                  Executor executor, WebService webService) {
-        return new AssetSentimentRepository(assetSentimentDao, executor, webService);
+                                          Executor executor, WebService webService, Clock clock) {
+        return new AssetSentimentRepository(assetSentimentDao, executor, webService, clock);
     }
 
     /**
@@ -87,7 +94,7 @@ public class AssetSentimentRepository {
                         Asset asset = assetSentiment.asset();
                         assetSentimentDao.addAsset(asset);
                         assetSentimentDao.updateSentiment(accountName, asset.id(), assetType,
-                                assetSentiment.sentimentType());
+                                assetSentiment.sentimentType(), false, Instant.now(clock));
                     }
                 });
             }
@@ -111,7 +118,9 @@ public class AssetSentimentRepository {
 
     /**
      * Inserts or replaces the user sentiment specified by the asset and account with the given
-     * sentiment type.
+     * sentiment type. The user sentiment is first sent to the server. If the server saves the
+     * sentiment successfully, then the sentiment will be saved locally with isPending set to false.
+     * Otherwise, the sentiment will be saved locally with isPending set to true.
      * @param accountName The account that the user sentiment is associated with.
      * @param assetId The id of the asset that the user sentiment is associated with.
      * @param assetType The type of the asset that the user sentiment is associated with.
@@ -119,8 +128,19 @@ public class AssetSentimentRepository {
      */
     void updateSentiment(String accountName, String assetId, AssetType assetType,
                          SentimentType sentimentType) {
-        executor.execute(() -> {
-            assetSentimentDao.updateSentiment(accountName, assetId, assetType, sentimentType);
+        Instant timestamp = Instant.now(clock);
+        LiveData<ApiResponse<UserSentiment>> apiCall = webService.updateSentiment(accountName,
+                assetId, assetType, sentimentType, timestamp);
+        apiCall.observeForever(new Observer<ApiResponse<UserSentiment>>() {
+            @Override
+            public void onChanged(ApiResponse<UserSentiment> response) {
+                apiCall.removeObserver(this);
+                boolean isPending = !response.isSuccessful();
+                executor.execute(() -> {
+                    assetSentimentDao.updateSentiment(accountName, assetId, assetType,
+                            sentimentType, isPending, timestamp);
+                });
+            }
         });
     }
 

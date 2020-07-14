@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -45,6 +46,32 @@ public class AssetSentimentController {
         List<AssetSentiment> withoutReaction = assetSentimentRepository.getAssetsWithoutSentiment(assetType, accountName);
         withReaction.addAll(withoutReaction);
         return withReaction;
+    }
+
+    /**
+     * Inserts or replaces the UserSentiment with the given fields into the user sentiments table. If the UserSentiment
+     * is saved successfully, the saved version is returned. If the user sentiment cannot be saved, an error message is
+     * returned.
+     * @param accountName The name of the account associated with the UserSentiment.
+     * @param assetId The id of the asset associated with the UserSentiment.
+     * @param assetType The type of the asset associated with the UserSentiment.
+     * @param sentimentType The type of the UserSentiment.
+     * @param timestamp The timestamp of the UserSentiment.
+     * @return A ResponseEntity with either the saved UserSentiment or the error message.
+     */
+    @PutMapping("/sentiment")
+    public ResponseEntity updateSentiment(@RequestParam String accountName, @RequestParam String assetId,
+                                          @RequestParam AssetType assetType, @RequestParam SentimentType sentimentType,
+                                          @RequestParam Instant timestamp) {
+        try {
+            UserSentiment userSentiment = UserSentiment.create(accountName, assetId, assetType, sentimentType, timestamp);
+            userSentiment = userSentimentRepository.save(userSentiment);
+            return ResponseEntity.ok().body(userSentiment);
+        } catch (JpaSystemException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 
     /**

@@ -72,6 +72,26 @@ public class UserSentiment {
     private Instant timestamp;
 
     /**
+     * Creates a new UserSentiment with the provided fields.
+     * @param accountName The name of the account associated with the UserSentiment.
+     * @param assetId The id of the asset associated with the UserSentiment.
+     * @param assetType The type of the asset associated with the UserSentiment.
+     * @param sentimentType The type of the UserSentiment.
+     * @param timestamp The timestamp of the UserSentiment.
+     * @return A new UserSentiment with the provided fields.
+     */
+    public static UserSentiment create(String accountName, String assetId, AssetType assetType,
+                                       SentimentType sentimentType, Instant timestamp) {
+        UserSentiment userSentiment = new UserSentiment();
+        userSentiment.accountName = accountName;
+        userSentiment.assetId = assetId;
+        userSentiment.assetType = assetType;
+        userSentiment.sentimentType = sentimentType;
+        userSentiment.timestamp = timestamp;
+        return userSentiment;
+    }
+
+    /**
      * Returns the id of the asset associated with this sentiment.
      */
     public String getAssetId() {

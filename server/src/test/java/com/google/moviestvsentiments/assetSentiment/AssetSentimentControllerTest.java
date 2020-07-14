@@ -16,6 +16,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.web.servlet.MockMvc;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -25,23 +26,16 @@ public class AssetSentimentControllerTest {
 
     private static final String ACCOUNT_NAME = "testAccount";
     private static final Asset ASSET = AssetUtil.createAsset("assetId", AssetType.MOVIE, "assetTitle");
-    private static final UserSentiment SENTIMENT_1 = createUserSentiment("assetId", ACCOUNT_NAME, AssetType.MOVIE,
-            SentimentType.THUMBS_UP);
-    private static final UserSentiment SENTIMENT_2 = createUserSentiment("assetId2", ACCOUNT_NAME, AssetType.SHOW,
-            SentimentType.THUMBS_DOWN);
+    private static final UserSentiment SENTIMENT_1 = UserSentiment.create(ACCOUNT_NAME, "assetId", AssetType.MOVIE,
+            SentimentType.THUMBS_UP, Instant.MAX);
+    private static final UserSentiment SENTIMENT_2 = UserSentiment.create(ACCOUNT_NAME,"assetId2", AssetType.SHOW,
+            SentimentType.THUMBS_DOWN, Instant.EPOCH);
     private static final String SENTIMENT_LIST_JSON = "[ { \"assetId\": \"assetId\", \"assetType\": \"MOVIE\", " +
-            "\"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_UP\"}, {\"assetId\": \"assetId2\", " +
-            "\"assetType\": \"SHOW\", \"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_DOWN\"} ]";
-
-    private static UserSentiment createUserSentiment(String assetId, String accountName, AssetType assetType,
-                                                     SentimentType sentimentType) {
-        UserSentiment sentiment = new UserSentiment();
-        sentiment.setAssetId(assetId);
-        sentiment.setAccountName(accountName);
-        sentiment.setAssetType(assetType);
-        sentiment.setSentimentType(sentimentType);
-        return sentiment;
-    }
+            "\"accountName\": \"testAccount\", \"sentimentType\": \"THUMBS_UP\", \"timestamp\": \""
+            + SENTIMENT_1.getTimestamp() + "\"}, {\"assetId\": \"assetId2\", \"assetType\": \"SHOW\", \"accountName\": " +
+            "\"testAccount\", \"sentimentType\": \"THUMBS_DOWN\", \"timestamp\": \"" + SENTIMENT_2.getTimestamp() + "\"}]";
+    private static final String UPDATE_SENTIMENT_URL = "/sentiment?accountName=" + ACCOUNT_NAME + "&assetId=assetId&" +
+            "assetType=MOVIE&sentimentType=THUMBS_UP&timestamp=" + Instant.MAX;
 
     @Autowired
     private MockMvc mockMvc;
@@ -63,8 +57,8 @@ public class AssetSentimentControllerTest {
 
     @Test
     public void getAssets_withReaction_returnsAssets() throws Exception {
-        UserSentiment sentiment = createUserSentiment(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
-                SentimentType.THUMBS_UP);
+        UserSentiment sentiment = UserSentiment.create(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
+                SentimentType.THUMBS_UP, Instant.EPOCH);
         when(assetSentimentRepository.getAssetsWithSentiment(AssetType.MOVIE, ACCOUNT_NAME, SentimentType.THUMBS_UP))
                 .thenReturn(Arrays.asList(new AssetSentiment(ASSET, sentiment)));
 
@@ -88,8 +82,8 @@ public class AssetSentimentControllerTest {
 
     @Test
     public void getAssets_withUnspecified_returnsAssets() throws Exception {
-        UserSentiment sentiment = createUserSentiment(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
-                SentimentType.UNSPECIFIED);
+        UserSentiment sentiment = UserSentiment.create(ASSET.getAssetId(), ACCOUNT_NAME, ASSET.getAssetType(),
+                SentimentType.UNSPECIFIED, Instant.EPOCH);
         Asset asset2 = AssetUtil.createAsset("assetId2", AssetType.MOVIE, "assetTitle2");
         when(assetSentimentRepository.getAssetsWithSentiment(AssetType.MOVIE, ACCOUNT_NAME, SentimentType.UNSPECIFIED))
                 .thenReturn(new ArrayList<>(Arrays.asList(new AssetSentiment(ASSET, sentiment))));
@@ -104,6 +98,56 @@ public class AssetSentimentControllerTest {
                 .andExpect(jsonPath("$[1].asset.assetId", equalTo(asset2.getAssetId())))
                 .andExpect(jsonPath("$[1].asset.assetType", equalTo("MOVIE")))
                 .andExpect(jsonPath("$[1].asset.title", equalTo(asset2.getTitle())));
+    }
+
+    @Test
+    public void updateSentiment_invokesRepository() throws Exception {
+        mockMvc.perform(put(UPDATE_SENTIMENT_URL));
+
+        verify(userSentimentRepository).save(SENTIMENT_1);
+    }
+
+    @Test
+    public void updateSentiment_successful_returnsOk() throws Exception {
+        mockMvc.perform(put(UPDATE_SENTIMENT_URL))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateSentiment_successful_returnsSentiment() throws Exception {
+        when(userSentimentRepository.save(SENTIMENT_1)).thenReturn(SENTIMENT_1);
+
+        mockMvc.perform(put(UPDATE_SENTIMENT_URL))
+                .andExpect(jsonPath("$.accountName", equalTo(ACCOUNT_NAME)))
+                .andExpect(jsonPath("$.assetId", equalTo(SENTIMENT_1.getAssetId())))
+                .andExpect(jsonPath("$.assetType", equalTo(SENTIMENT_1.getAssetType().toString())))
+                .andExpect(jsonPath("$.sentimentType", equalTo(SENTIMENT_1.getSentimentType().toString())))
+                .andExpect(jsonPath("$.timestamp", equalTo(SENTIMENT_1.getTimestamp().toString())));
+    }
+
+    @Test
+    public void updateSentiment_jpaException_returnsBadRequest() throws Exception {
+        when(userSentimentRepository.save(SENTIMENT_1)).thenThrow(JpaSystemException.class);
+
+        mockMvc.perform(put(UPDATE_SENTIMENT_URL))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void updateSentiment_otherException_returnsServerError() throws Exception {
+        when(userSentimentRepository.save(SENTIMENT_1)).thenThrow(RuntimeException.class);
+
+        mockMvc.perform(put(UPDATE_SENTIMENT_URL))
+                .andExpect(status().is5xxServerError());
+    }
+
+    @Test
+    public void updateSentiment_failure_returnsError() throws Exception {
+        final String errorMessage = "Invalid account name";
+        when(userSentimentRepository.save(SENTIMENT_1)).thenThrow(new RuntimeException(errorMessage));
+
+        mockMvc.perform(put(UPDATE_SENTIMENT_URL))
+                .andExpect(jsonPath("$", equalTo(errorMessage)));
     }
 
     @Test
