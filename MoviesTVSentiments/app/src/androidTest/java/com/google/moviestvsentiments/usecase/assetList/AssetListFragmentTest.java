@@ -37,6 +37,7 @@ import com.google.moviestvsentiments.HiltFragmentScenario;
 import com.google.moviestvsentiments.usecase.details.DetailsActivity;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import com.google.moviestvsentiments.util.AssetUtil;
+import java.time.Instant;
 
 @UninstallModules({DatabaseModule.class, WebModule.class})
 @HiltAndroidTest
@@ -98,7 +99,7 @@ public class AssetListFragmentTest {
             SentimentType sentimentType, AssetType assetType, int listId) {
         database.assetSentimentDao().addAsset(AssetUtil.createAsset("assetId1", assetType));
         database.assetSentimentDao().updateSentiment("Test Account", "assetId1",
-                assetType, sentimentType);
+                assetType, sentimentType, false, Instant.EPOCH);
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
         intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
 
@@ -141,7 +142,7 @@ public class AssetListFragmentTest {
             SentimentType sentimentType, SentimentType otherSentiment, AssetType assetType) {
         database.assetSentimentDao().addAsset(AssetUtil.createAsset("assetId", assetType));
         database.assetSentimentDao().updateSentiment("Test Account", "assetId",
-                assetType, otherSentiment);
+                assetType, otherSentiment, false, Instant.EPOCH);
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(), HiltTestActivity.class);
         intent.putExtra(SigninActivity.EXTRA_ACCOUNT_NAME, "Test Account");
 

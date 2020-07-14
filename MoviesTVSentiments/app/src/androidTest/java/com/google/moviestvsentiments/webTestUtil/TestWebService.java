@@ -6,6 +6,7 @@ import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.model.UserSentiment;
 import com.google.moviestvsentiments.service.web.ApiResponse;
 import com.google.moviestvsentiments.service.web.WebService;
 import java.time.Instant;
@@ -34,7 +35,14 @@ public class TestWebService implements WebService {
     }
 
     @Override
-    public LiveData<ApiResponse<List<AssetSentiment>>> getAssets(AssetType assetType, String accountName, SentimentType sentimentType) {
+    public LiveData<ApiResponse<List<AssetSentiment>>> getAssets(AssetType assetType,
+                                                 String accountName, SentimentType sentimentType) {
+        return new MutableLiveData<>(new ApiResponse(new RuntimeException(ERROR)));
+    }
+
+    @Override
+    public LiveData<ApiResponse<UserSentiment>> updateSentiment(String accountName, String assetId,
+                            AssetType assetType, SentimentType sentimentType, Instant timestamp) {
         return new MutableLiveData<>(new ApiResponse(new RuntimeException(ERROR)));
     }
 }

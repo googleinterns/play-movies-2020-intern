@@ -5,11 +5,13 @@ import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.model.UserSentiment;
 import java.time.Instant;
 import java.util.List;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 /**
@@ -55,4 +57,21 @@ public interface WebService {
     LiveData<ApiResponse<List<AssetSentiment>>> getAssets(@Query("assetType") AssetType assetType,
                                               @Query("accountName") String accountName,
                                               @Query("sentimentType") SentimentType sentimentType);
+
+    /**
+     * Updates the UserSentiment on the remote server's database and returns the successfully
+     * saved UserSentiment.
+     * @param accountName The name of the account that the UserSentiment is associated with.
+     * @param assetId The id of the asset that the UserSentiment is associated with.
+     * @param assetType The type of the asset that the UserSentiment is associated with.
+     * @param sentimentType The type of the UserSentiment.
+     * @param timestamp The timestamp of the UserSentiment.
+     * @return The successfully saved UserSentiment.
+     */
+    @PUT("sentiment")
+    LiveData<ApiResponse<UserSentiment>> updateSentiment(@Query("accountName") String accountName,
+                                             @Query("assetId") String assetId,
+                                             @Query("assetType") AssetType assetType,
+                                             @Query("sentimentType") SentimentType sentimentType,
+                                             @Query("timestamp") Instant timestamp);
 }

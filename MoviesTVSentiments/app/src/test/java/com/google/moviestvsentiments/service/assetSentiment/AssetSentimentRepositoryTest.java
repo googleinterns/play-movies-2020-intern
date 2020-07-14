@@ -12,6 +12,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.model.UserSentiment;
 import com.google.moviestvsentiments.service.web.ApiResponse;
 import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.service.web.WebService;
@@ -23,6 +24,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import retrofit2.Response;
@@ -45,7 +49,9 @@ public class AssetSentimentRepositoryTest {
     public void setUp() {
         dao = mock(AssetSentimentDao.class);
         webService = mock(WebService.class);
-        repository = AssetSentimentRepository.create(dao, new MainThreadDatabaseExecutor(), webService);
+        Clock clock = Clock.fixed(Instant.EPOCH, ZoneId.systemDefault());
+        repository = AssetSentimentRepository.create(dao, new MainThreadDatabaseExecutor(),
+                webService, clock);
     }
 
     @Test
@@ -104,14 +110,34 @@ public class AssetSentimentRepositoryTest {
 
         verify(dao, times(1)).addAsset(remoteSentiment.asset());
         verify(dao, times(1)).updateSentiment(ACCOUNT_NAME,
-                remoteSentiment.asset().id(), AssetType.SHOW, SentimentType.UNSPECIFIED);
+                remoteSentiment.asset().id(), AssetType.SHOW, SentimentType.UNSPECIFIED,
+                false, Instant.EPOCH);
     }
 
     @Test
-    public void updateSentiment_invokesDao() {
+    public void updateSentiment_webServiceFailure_setsIsPendingTrue() {
+        MutableLiveData<ApiResponse<UserSentiment>> apiResponse = new MutableLiveData<>(
+                new ApiResponse(new RuntimeException("Network error")));
+        when(webService.updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW,
+                SentimentType.THUMBS_UP, Instant.EPOCH)).thenReturn(apiResponse);
+
         repository.updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW, SentimentType.THUMBS_UP);
 
-        verify(dao).updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW, SentimentType.THUMBS_UP);
+        verify(dao).updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW, SentimentType.THUMBS_UP,
+                true, Instant.EPOCH);
+    }
+
+    @Test
+    public void updateSentiment_webServiceSuccess_setsIsPendingFalse() {
+        MutableLiveData<ApiResponse<UserSentiment>> apiResponse = new MutableLiveData<>(
+                new ApiResponse(Response.success(new UserSentiment())));
+        when(webService.updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW,
+                SentimentType.THUMBS_UP, Instant.EPOCH)).thenReturn(apiResponse);
+
+        repository.updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW, SentimentType.THUMBS_UP);
+
+        verify(dao).updateSentiment(ACCOUNT_NAME, ASSET_ID, AssetType.SHOW, SentimentType.THUMBS_UP,
+                false, Instant.EPOCH);
     }
 
     @Test

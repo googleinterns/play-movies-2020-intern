@@ -31,4 +31,8 @@ public class UserSentiment {
     @NonNull
     @ColumnInfo(name = "timestamp", defaultValue = "CURRENT_TIMESTAMP")
     public Instant timestamp;
+
+    @NonNull
+    @ColumnInfo(name = "is_pending", defaultValue = "0")
+    public boolean isPending;
 }

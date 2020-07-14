@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import java.time.Instant;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
@@ -86,7 +87,7 @@ public class AssetSentimentDaoTest {
     public void addAndGetAsset_withSentiment_returnsAssetSentiment() {
         assetSentimentDao.addAsset(MOVIE_ASSET);
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
 
         AssetSentiment result = LiveDataTestUtil.getValue(assetSentimentDao.getAsset("accountName",
                 "assetId", AssetType.MOVIE));
@@ -99,7 +100,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.UNSPECIFIED);
+                AssetType.MOVIE, SentimentType.UNSPECIFIED, false, Instant.EPOCH);
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.SHOW, "accountName", SentimentType.UNSPECIFIED));
 
@@ -111,7 +112,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.MOVIE, "incorrectName", SentimentType.THUMBS_UP));
 
@@ -123,7 +124,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.MOVIE, "accountName", SentimentType.THUMBS_DOWN));
 
@@ -136,9 +137,9 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET_2);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
         assetSentimentDao.updateSentiment("accountName", "assetId2",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
 
@@ -153,7 +154,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET_2);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.UNSPECIFIED);
+                AssetType.MOVIE, SentimentType.UNSPECIFIED, false, Instant.EPOCH);
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.MOVIE, "accountName", SentimentType.UNSPECIFIED));
 
@@ -167,7 +168,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
         assetSentimentDao.deleteAllSentiments("accountName");
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
@@ -180,7 +181,7 @@ public class AssetSentimentDaoTest {
         assetSentimentDao.addAsset(MOVIE_ASSET);
 
         assetSentimentDao.updateSentiment("accountName", "assetId",
-                AssetType.MOVIE, SentimentType.THUMBS_UP);
+                AssetType.MOVIE, SentimentType.THUMBS_UP, false, Instant.EPOCH);
         assetSentimentDao.deleteAllSentiments("otherName");
         List<AssetSentiment> results = LiveDataTestUtil.getValue(assetSentimentDao.getAssets(
                 AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
