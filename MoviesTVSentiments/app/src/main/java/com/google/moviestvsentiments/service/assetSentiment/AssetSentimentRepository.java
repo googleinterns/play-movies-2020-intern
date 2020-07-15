@@ -153,4 +153,22 @@ public class AssetSentimentRepository {
             assetSentimentDao.deleteAllSentiments(accountName);
         });
     }
+
+    /**
+     * Sends the list of pending UserSentiments to the server. If the server successfully saves them
+     * in its database, then the UserSentiments are updated locally to no longer be pending.
+     */
+    public void syncPendingSentiments() {
+        executor.execute(() -> {
+            List<UserSentiment> pendingSentiments = assetSentimentDao.getPendingSentiments();
+            if (pendingSentiments.isEmpty()) {
+                return;
+            }
+
+            ApiResponse<List<UserSentiment>> response = webService.syncPendingSentiments(pendingSentiments);
+            if (response.isSuccessful()) {
+                assetSentimentDao.updateSentiments(response.getBody());
+            }
+        });
+    }
 }

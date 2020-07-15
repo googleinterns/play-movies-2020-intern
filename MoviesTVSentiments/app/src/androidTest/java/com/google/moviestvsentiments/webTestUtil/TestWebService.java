@@ -45,4 +45,9 @@ public class TestWebService implements WebService {
                             AssetType assetType, SentimentType sentimentType, Instant timestamp) {
         return new MutableLiveData<>(new ApiResponse(new RuntimeException(ERROR)));
     }
+
+    @Override
+    public ApiResponse<List<UserSentiment>> syncPendingSentiments(List<UserSentiment> sentiments) {
+        return new ApiResponse(new RuntimeException(ERROR));
+    }
 }

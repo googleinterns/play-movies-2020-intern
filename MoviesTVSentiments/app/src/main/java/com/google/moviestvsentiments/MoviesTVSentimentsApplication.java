@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import com.google.moviestvsentiments.service.account.AccountRepository;
+import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentRepository;
 import javax.inject.Inject;
 import dagger.hilt.android.HiltAndroidApp;
 
@@ -17,6 +18,9 @@ public class MoviesTVSentimentsApplication extends Application {
     @Inject
     AccountRepository accountRepository;
 
+    @Inject
+    AssetSentimentRepository assetSentimentRepository;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,6 +32,7 @@ public class MoviesTVSentimentsApplication extends Application {
             @Override
             public void onAvailable(Network network) {
                 accountRepository.syncPendingAccounts();
+                assetSentimentRepository.syncPendingSentiments();
             }
         });
     }

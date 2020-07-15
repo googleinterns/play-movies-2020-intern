@@ -168,16 +168,8 @@ public class AssetSentimentControllerTest {
         when(userSentimentRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(SENTIMENT_1, SENTIMENT_2));
 
         mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
-                .andExpect(jsonPath("$.sentiments[0].sentimentType", equalTo("THUMBS_UP")))
-                .andExpect(jsonPath("$.sentiments[1].sentimentType", equalTo("THUMBS_DOWN")));
-    }
-
-    @Test
-    public void updateSentiments_successful_returnsNullError() throws Exception {
-        when(userSentimentRepository.saveAll(any(Iterable.class))).thenReturn(Arrays.asList(SENTIMENT_1, SENTIMENT_2));
-
-        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
-                .andExpect(jsonPath("$.error", equalTo(null)));
+                .andExpect(jsonPath("$[0].sentimentType", equalTo("THUMBS_UP")))
+                .andExpect(jsonPath("$[1].sentimentType", equalTo("THUMBS_DOWN")));
     }
 
     @Test
@@ -197,19 +189,11 @@ public class AssetSentimentControllerTest {
     }
 
     @Test
-    public void updateSentiments_failure_returnsNullList() throws Exception {
-        when(userSentimentRepository.saveAll(any(Iterable.class))).thenThrow(JpaSystemException.class);
-
-        mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
-                .andExpect(jsonPath("$.sentiments", equalTo(null)));
-    }
-
-    @Test
     public void updateSentiments_failure_returnsError() throws Exception {
         final String errorMessage = "Error message";
         when(userSentimentRepository.saveAll(any(Iterable.class))).thenThrow(new RuntimeException(errorMessage));
 
         mockMvc.perform(put("/sentiments").contentType(MediaType.APPLICATION_JSON).content(SENTIMENT_LIST_JSON))
-                .andExpect(jsonPath("$.error", equalTo(errorMessage)));
+                .andExpect(jsonPath("$", equalTo(errorMessage)));
     }
 }
