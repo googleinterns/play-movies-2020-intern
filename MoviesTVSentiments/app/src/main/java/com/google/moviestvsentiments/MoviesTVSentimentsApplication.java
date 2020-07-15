@@ -21,6 +21,7 @@ public class MoviesTVSentimentsApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
+        // TODO: schedule/retry syncing with server
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         connectivityManager.registerDefaultNetworkCallback(new ConnectivityManager.NetworkCallback() {
