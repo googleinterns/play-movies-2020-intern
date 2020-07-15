@@ -62,4 +62,20 @@ public abstract class AccountDao {
     // to allow the public API to return a boolean.
     @Query("UPDATE accounts_table SET is_current = :isCurrent WHERE account_name = :name")
     protected abstract int setIsCurrentQuery(String name, boolean isCurrent);
+
+    /**
+     * Returns a list of all accounts that have isPending set to true.
+     */
+    @Query("SELECT * FROM accounts_table WHERE is_pending = 1")
+    public abstract List<Account> getPendingAccounts();
+
+    /**
+     * Sets isPending to false for each of the given Account names. This method should be used
+     * when the pending accounts have been successfully synced with the server. The addAccounts
+     * method cannot be used because the current account may have been pending, and the addAccounts
+     * method would replace the database record, clearing its isCurrent flag.
+     * @param accountNames The names of the Accounts whose isPending flag should be cleared.
+     */
+    @Query("UPDATE accounts_table SET is_pending = 0 WHERE account_name IN (:accountNames)")
+    public abstract void clearIsPending(List<String> accountNames);
 }

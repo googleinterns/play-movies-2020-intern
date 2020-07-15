@@ -30,8 +30,8 @@ public class TestWebService implements WebService {
     }
 
     @Override
-    public LiveData<ApiResponse<List<Account>>> addAccounts(List<Account> accounts) {
-        return new MutableLiveData<>(new ApiResponse(new RuntimeException(ERROR)));
+    public ApiResponse<List<Account>> syncPendingAccounts(List<Account> accounts) {
+        return new ApiResponse(new RuntimeException(ERROR));
     }
 
     @Override

@@ -43,7 +43,7 @@ public interface WebService {
      * @return The list of successfully added Accounts.
      */
     @POST("accounts")
-    LiveData<ApiResponse<List<Account>>> addAccounts(@Body List<Account> accounts);
+    ApiResponse<List<Account>> syncPendingAccounts(@Body List<Account> accounts);
 
     /**
      * Returns a LiveData list of AssetSentiments that match the given AssetType, account name

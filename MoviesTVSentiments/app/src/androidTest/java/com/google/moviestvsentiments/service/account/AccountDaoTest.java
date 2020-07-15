@@ -16,10 +16,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
 public class AccountDaoTest {
+
+    private static final String ACCOUNT_NAME_1 = "John Doe";
+    private static final String ACCOUNT_NAME_2 = "Jane Doe";
 
     @Rule
     public InstantTaskExecutorRule instantTaskExecutorRule = new InstantTaskExecutorRule();
@@ -42,15 +46,15 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_returnsName() {
-        accountDao.addAccount("John Doe", Instant.MAX, false);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
-        assertThat(accounts.get(0).name()).isEqualTo("John Doe");
+        assertThat(accounts.get(0).name()).isEqualTo(ACCOUNT_NAME_1);
     }
 
     @Test
     public void addAndGetAccount_returnsIsCurrent() {
-        accountDao.addAccount("John Doe", Instant.MAX, false);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts.get(0).isCurrent()).isFalse();
@@ -58,7 +62,7 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_returnsTimestamp() {
-        accountDao.addAccount("John Doe", Instant.MAX, false);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts.get(0).timestamp().getEpochSecond())
@@ -67,7 +71,7 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_returnsIsPending() {
-        accountDao.addAccount("John Doe", Instant.MAX, true);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, true);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts.get(0).isPending()).isTrue();
@@ -75,19 +79,19 @@ public class AccountDaoTest {
 
     @Test
     public void addAndGetAccount_multipleAccounts_returnsAllAccounts() {
-        accountDao.addAccount("John Doe", Instant.MAX, false);
-        accountDao.addAccount("Jane Doe", Instant.MAX, true);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
+        accountDao.addAccount(ACCOUNT_NAME_2, Instant.MAX, true);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts).hasSize(2);
-        assertThat(accounts.get(0).name()).isEqualTo("Jane Doe");
-        assertThat(accounts.get(1).name()).isEqualTo("John Doe");
+        assertThat(accounts.get(0).name()).isEqualTo(ACCOUNT_NAME_2);
+        assertThat(accounts.get(1).name()).isEqualTo(ACCOUNT_NAME_1);
     }
 
     @Test
     public void addAndGetAccount_duplicateAccount_returnsOneAccount() {
-        accountDao.addAccount("John Doe", Instant.MAX, false);
-        accountDao.addAccount("John Doe", Instant.MAX, false);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
         List<Account> accounts = LiveDataTestUtil.getValue(accountDao.getAlphabetizedAccounts());
 
         assertThat(accounts).hasSize(1);
@@ -118,12 +122,53 @@ public class AccountDaoTest {
 
     @Test
     public void getCurrentAccount_withCurrentSet_returnsAccount() {
-        accountDao.addAccount("John Doe", Instant.MAX, false);
-        accountDao.setIsCurrent("John Doe", true);
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.MAX, false);
+        accountDao.setIsCurrent(ACCOUNT_NAME_1, true);
 
         Account account = LiveDataTestUtil.getValue(accountDao.getCurrentAccount());
 
-        assertThat(account.name()).isEqualTo("John Doe");
+        assertThat(account.name()).isEqualTo(ACCOUNT_NAME_1);
         assertThat(account.isCurrent()).isTrue();
+    }
+
+    @Test
+    public void getPendingAccounts_withNonePending_returnsEmptyList() {
+        List<Account> pendingAccounts = accountDao.getPendingAccounts();
+
+        assertThat(pendingAccounts).isEmpty();
+    }
+
+    @Test
+    public void getPendingAccounts_withSomePending_returnsAccounts() {
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.EPOCH, true);
+        accountDao.addAccount(ACCOUNT_NAME_2, Instant.EPOCH, true);
+
+        List<Account> pendingAccounts = accountDao.getPendingAccounts();
+
+        assertThat(pendingAccounts).containsExactly(
+                Account.create(ACCOUNT_NAME_1, Instant.EPOCH, false, true),
+                Account.create(ACCOUNT_NAME_2, Instant.EPOCH, false, true));
+    }
+
+    @Test
+    public void clearIsPending_andGetPending_returnsEmptyList() {
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.EPOCH, true);
+
+        accountDao.clearIsPending(Arrays.asList(ACCOUNT_NAME_1));
+        List<Account> pendingAccounts = accountDao.getPendingAccounts();
+
+        assertThat(pendingAccounts).isEmpty();
+    }
+
+    @Test
+    public void clearIsPending_doesNotClearIsCurrent() {
+        accountDao.addAccount(ACCOUNT_NAME_1, Instant.EPOCH, true);
+        accountDao.setIsCurrent(ACCOUNT_NAME_1, true);
+
+        accountDao.clearIsPending(Arrays.asList(ACCOUNT_NAME_1));
+        Account account = LiveDataTestUtil.getValue(accountDao.getCurrentAccount());
+
+        assertThat(account).isEqualTo(Account.create(ACCOUNT_NAME_1, Instant.EPOCH, true,
+                false));
     }
 }

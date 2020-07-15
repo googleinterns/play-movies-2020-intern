@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.di;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.moviestvsentiments.service.web.LiveDataCallAdapterFactory;
+import com.google.moviestvsentiments.service.web.SynchronousCallAdapterFactory;
 import com.google.moviestvsentiments.service.web.WebService;
 import javax.inject.Singleton;
 import dagger.Module;
@@ -35,6 +36,7 @@ public class WebModule {
                 .baseUrl(API_BASE_URL)
                 .addConverterFactory(JacksonConverterFactory.create(mapper))
                 .addCallAdapterFactory(new LiveDataCallAdapterFactory())
+                .addCallAdapterFactory(new SynchronousCallAdapterFactory())
                 .build();
         return retrofit.create(WebService.class);
     }
