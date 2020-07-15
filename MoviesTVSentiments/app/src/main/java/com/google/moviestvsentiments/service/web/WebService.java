@@ -74,4 +74,13 @@ public interface WebService {
                                              @Query("assetType") AssetType assetType,
                                              @Query("sentimentType") SentimentType sentimentType,
                                              @Query("timestamp") Instant timestamp);
+
+    /**
+     * Adds the given list of UserSentiments to the remote server's database and returns the list
+     * of successfully saved UserSentiments.
+     * @param sentiments The list of UserSentiments to save in the server's database.
+     * @return The list of successfully saved UserSentiments.
+     */
+    @PUT("sentiments")
+    ApiResponse<List<UserSentiment>> syncPendingSentiments(@Body List<UserSentiment> sentiments);
 }

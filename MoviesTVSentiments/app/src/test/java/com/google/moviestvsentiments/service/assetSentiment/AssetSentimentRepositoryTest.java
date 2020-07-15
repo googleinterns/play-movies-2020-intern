@@ -1,9 +1,11 @@
 package com.google.moviestvsentiments.service.assetSentiment;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -145,5 +147,40 @@ public class AssetSentimentRepositoryTest {
         repository.deleteAllSentiments(ACCOUNT_NAME);
 
         verify(dao).deleteAllSentiments(ACCOUNT_NAME);
+    }
+
+    @Test
+    public void syncPendingSentiments_nonePending_doesNotInvokeWebService() {
+        when(dao.getPendingSentiments()).thenReturn(Arrays.asList());
+
+        repository.syncPendingSentiments();
+
+        verifyZeroInteractions(webService);
+    }
+
+    @Test
+    public void syncPendingSentiments_failure_doesNotUpdateSentiments() {
+        List<UserSentiment> sentimentList = Arrays.asList(UserSentiment.create(ASSET_ID,
+                ACCOUNT_NAME, AssetType.SHOW, SentimentType.THUMBS_UP, Instant.MAX, true));
+        when(dao.getPendingSentiments()).thenReturn(sentimentList);
+        when(webService.syncPendingSentiments(sentimentList)).thenReturn(
+                new ApiResponse(new RuntimeException("Network failure")));
+
+        repository.syncPendingSentiments();
+
+        verify(dao, times(0)).updateSentiments(anyList());
+    }
+
+    @Test
+    public void syncPendingSentiments_success_updatesSentiments() {
+        List<UserSentiment> sentimentList = Arrays.asList(UserSentiment.create(ASSET_ID,
+                ACCOUNT_NAME, AssetType.SHOW, SentimentType.THUMBS_UP, Instant.MAX, true));
+        when(dao.getPendingSentiments()).thenReturn(sentimentList);
+        when(webService.syncPendingSentiments(sentimentList)).thenReturn(
+                new ApiResponse(Response.success(sentimentList)));
+
+        repository.syncPendingSentiments();
+
+        verify(dao).updateSentiments(sentimentList);
     }
 }

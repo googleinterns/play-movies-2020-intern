@@ -82,17 +82,16 @@ public class AssetSentimentController {
      * @return A ResponseEntity with either the updated UserSentiments or the error message.
      */
     @PutMapping("/sentiments")
-    public ResponseEntity<UpdateSentimentResponse> updateSentiments(@RequestBody List<UserSentiment> sentiments) {
+    public ResponseEntity updateSentiments(@RequestBody List<UserSentiment> sentiments) {
         try {
             Iterable<UserSentiment> iterable = userSentimentRepository.saveAll(sentiments);
             List<UserSentiment> savedSentiments = StreamSupport.stream(iterable.spliterator(), false)
                     .collect(Collectors.toList());
-            return ResponseEntity.ok().body(UpdateSentimentResponse.create(savedSentiments, null));
+            return ResponseEntity.ok().body(savedSentiments);
         } catch (JpaSystemException e) {
-            return ResponseEntity.badRequest().body(UpdateSentimentResponse.create(null, e.getMessage()));
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    UpdateSentimentResponse.create(null, e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 }

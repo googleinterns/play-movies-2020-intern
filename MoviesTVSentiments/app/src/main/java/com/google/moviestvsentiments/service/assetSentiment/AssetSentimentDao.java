@@ -10,6 +10,8 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.model.UserSentiment;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -138,9 +140,22 @@ public abstract class AssetSentimentDao {
                                  SentimentType sentimentType, boolean isPending, Instant timestamp);
 
     /**
+     * Inserts or replaces the given list of UserSentiments.
+     * @param sentiments The UserSentiments to insert.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void updateSentiments(List<UserSentiment> sentiments);
+
+    /**
      * Deletes all user sentiments corresponding to the given account name.
      * @param accountName The account to delete all sentiments for.
      */
     @Query("DELETE FROM user_sentiments_table WHERE account_name = :accountName")
     public abstract void deleteAllSentiments(String accountName);
+
+    /**
+     * Returns a list of all UserSentiments that have isPending set to true.
+     */
+    @Query("SELECT * FROM user_sentiments_table WHERE is_pending = 1")
+    public abstract List<UserSentiment> getPendingSentiments();
 }

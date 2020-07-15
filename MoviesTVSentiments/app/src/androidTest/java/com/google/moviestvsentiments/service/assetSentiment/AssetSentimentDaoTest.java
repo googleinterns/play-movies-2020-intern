@@ -11,6 +11,7 @@ import com.google.moviestvsentiments.model.Asset;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
+import com.google.moviestvsentiments.model.UserSentiment;
 import com.google.moviestvsentiments.service.database.SentimentsDatabase;
 import com.google.moviestvsentiments.util.AssetUtil;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
@@ -20,6 +21,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(AndroidJUnit4.class)
@@ -187,5 +189,42 @@ public class AssetSentimentDaoTest {
                 AssetType.MOVIE, "accountName", SentimentType.THUMBS_UP));
 
         assertThat(results).containsExactly(AssetSentiment.create(MOVIE_ASSET, SentimentType.THUMBS_UP));
+    }
+
+    @Test
+    public void getPendingSentiments_withNonePending_returnsEmptyList() {
+        List<UserSentiment> sentiments = assetSentimentDao.getPendingSentiments();
+
+        assertThat(sentiments).isEmpty();
+    }
+
+    @Test
+    public void getPendingSentiments_withSomePending_returnsSentiments() {
+        assetSentimentDao.updateSentiment("accountName", "assetId", AssetType.MOVIE,
+                SentimentType.THUMBS_DOWN, true, Instant.EPOCH);
+        assetSentimentDao.updateSentiment("accountName2", "assetId2", AssetType.SHOW,
+                SentimentType.THUMBS_UP, true, Instant.EPOCH);
+
+        List<UserSentiment> sentiments = assetSentimentDao.getPendingSentiments();
+
+        assertThat(sentiments).hasSize(2);
+    }
+
+    @Test
+    public void updateSentiments_andGetPending_returnsEmptyList() {
+        assetSentimentDao.updateSentiment("accountName", "assetId", AssetType.MOVIE,
+                SentimentType.THUMBS_DOWN, true, Instant.EPOCH);
+        assetSentimentDao.updateSentiment("accountName2", "assetId2", AssetType.SHOW,
+                SentimentType.THUMBS_UP, true, Instant.EPOCH);
+
+        assetSentimentDao.updateSentiments(Arrays.asList(
+                UserSentiment.create("assetId", "accountName", AssetType.MOVIE,
+                        SentimentType.THUMBS_DOWN, Instant.EPOCH, false),
+                UserSentiment.create("assetId2", "accountName2", AssetType.SHOW,
+                        SentimentType.THUMBS_UP, Instant.EPOCH, false)
+        ));
+        List<UserSentiment> sentiments = assetSentimentDao.getPendingSentiments();
+
+        assertThat(sentiments).isEmpty();
     }
 }
