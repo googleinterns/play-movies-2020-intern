@@ -9,9 +9,9 @@ import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.service.web.WebService;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
@@ -114,6 +114,26 @@ public class AccountRepository {
     void setIsCurrent(String name, boolean isCurrent) {
         executor.execute(() -> {
             accountDao.setIsCurrent(name, isCurrent);
+        });
+    }
+
+    /**
+     * Sends the list of pending Accounts to the server. If the server successfully adds them to its
+     * database, then the Accounts are updated locally to no longer be pending.
+     */
+    public void syncPendingAccounts() {
+        executor.execute(() -> {
+            List<Account> pendingAccounts = accountDao.getPendingAccounts();
+            if (pendingAccounts.isEmpty()) {
+                return;
+            }
+
+            ApiResponse<List<Account>> response = webService.syncPendingAccounts(pendingAccounts);
+            if (response.isSuccessful()) {
+                List<String> accountNames = response.getBody().stream().map(account -> account.name())
+                        .collect(Collectors.toList());
+                accountDao.clearIsPending(accountNames);
+            }
         });
     }
 }

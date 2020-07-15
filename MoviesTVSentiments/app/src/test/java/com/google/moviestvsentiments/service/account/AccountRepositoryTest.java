@@ -1,9 +1,11 @@
 package com.google.moviestvsentiments.service.account;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
@@ -96,7 +98,7 @@ public class AccountRepositoryTest {
         Resource<List<Account>> results = LiveDataTestUtil.getValue(repository.getAlphabetizedAccounts());
 
         assertThat(results.getStatus()).isEqualTo(Resource.Status.SUCCESS);
-        verify(dao, times(1)).addAccounts(remoteAccounts);
+        verify(dao).addAccounts(remoteAccounts);
     }
 
     @Test
@@ -115,5 +117,38 @@ public class AccountRepositoryTest {
         repository.setIsCurrent("Account Name", false);
 
         verify(dao).setIsCurrent("Account Name", false);
+    }
+
+    @Test
+    public void syncPendingAccounts_nonePending_doesNotInvokeWebService() {
+        when(dao.getPendingAccounts()).thenReturn(Arrays.asList());
+
+        repository.syncPendingAccounts();
+
+        verifyZeroInteractions(webService);
+    }
+
+    @Test
+    public void syncPendingAccounts_failure_doesNotUpdateAccounts() {
+        List<Account> accountList = Arrays.asList(ACCOUNT);
+        when(dao.getPendingAccounts()).thenReturn(accountList);
+        when(webService.syncPendingAccounts(accountList)).thenReturn(
+                new ApiResponse(new RuntimeException("Network failure")));
+
+        repository.syncPendingAccounts();
+
+        verify(dao, times(0)).clearIsPending(anyList());
+    }
+
+    @Test
+    public void syncPendingAccounts_success_updatesAccounts() {
+        List<Account> accountList = Arrays.asList(ACCOUNT);
+        when(dao.getPendingAccounts()).thenReturn(accountList);
+        when(webService.syncPendingAccounts(accountList)).thenReturn(
+                new ApiResponse(Response.success(accountList)));
+
+        repository.syncPendingAccounts();
+
+        verify(dao).clearIsPending(Arrays.asList(ACCOUNT.name()));
     }
 }
