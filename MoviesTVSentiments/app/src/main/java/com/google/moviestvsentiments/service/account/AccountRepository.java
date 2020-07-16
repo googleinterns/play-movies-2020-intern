@@ -119,21 +119,22 @@ public class AccountRepository {
 
     /**
      * Sends the list of pending Accounts to the server. If the server successfully adds them to its
-     * database, then the Accounts are updated locally to no longer be pending.
+     * database, then the Accounts are updated locally to no longer be pending. This method should
+     * not be called from the main thread.
+     * @return True if the Accounts are synced successfully.
      */
-    public void syncPendingAccounts() {
-        executor.execute(() -> {
-            List<Account> pendingAccounts = accountDao.getPendingAccounts();
-            if (pendingAccounts.isEmpty()) {
-                return;
-            }
+    public boolean syncPendingAccounts() {
+        List<Account> pendingAccounts = accountDao.getPendingAccounts();
+        if (pendingAccounts.isEmpty()) {
+            return true;
+        }
 
-            ApiResponse<List<Account>> response = webService.syncPendingAccounts(pendingAccounts);
-            if (response.isSuccessful()) {
-                List<String> accountNames = response.getBody().stream().map(account -> account.name())
-                        .collect(Collectors.toList());
-                accountDao.clearIsPending(accountNames);
-            }
-        });
+        ApiResponse<List<Account>> response = webService.syncPendingAccounts(pendingAccounts);
+        if (response.isSuccessful()) {
+            List<String> accountNames = response.getBody().stream().map(account -> account.name())
+                    .collect(Collectors.toList());
+            accountDao.clearIsPending(accountNames);
+        }
+        return response.isSuccessful();
     }
 }

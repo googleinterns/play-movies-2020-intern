@@ -156,19 +156,20 @@ public class AssetSentimentRepository {
 
     /**
      * Sends the list of pending UserSentiments to the server. If the server successfully saves them
-     * in its database, then the UserSentiments are updated locally to no longer be pending.
+     * in its database, then the UserSentiments are updated locally to no longer be pending. This
+     * method should not be called from the main thread.
+     * @return True if the UserSentiments are saved correctly.
      */
-    public void syncPendingSentiments() {
-        executor.execute(() -> {
-            List<UserSentiment> pendingSentiments = assetSentimentDao.getPendingSentiments();
-            if (pendingSentiments.isEmpty()) {
-                return;
-            }
+    public boolean syncPendingSentiments() {
+        List<UserSentiment> pendingSentiments = assetSentimentDao.getPendingSentiments();
+        if (pendingSentiments.isEmpty()) {
+            return true;
+        }
 
-            ApiResponse<List<UserSentiment>> response = webService.syncPendingSentiments(pendingSentiments);
-            if (response.isSuccessful()) {
-                assetSentimentDao.updateSentiments(response.getBody());
-            }
-        });
+        ApiResponse<List<UserSentiment>> response = webService.syncPendingSentiments(pendingSentiments);
+        if (response.isSuccessful()) {
+            assetSentimentDao.updateSentiments(response.getBody());
+        }
+        return response.isSuccessful();
     }
 }
