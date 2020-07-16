@@ -12,6 +12,8 @@ import androidx.work.WorkerParameters;
  */
 public class AccountSyncWorker extends Worker {
 
+    private static final int MAX_RUN_ATTEMPTS = 3;
+
     private final AccountRepository repository;
 
     @WorkerInject
@@ -24,6 +26,9 @@ public class AccountSyncWorker extends Worker {
 
     @Override
     public Result doWork() {
+        if (getRunAttemptCount() > MAX_RUN_ATTEMPTS) {
+            return Result.failure();
+        }
         if (repository.syncPendingAccounts()) {
             return Result.success();
         }

@@ -12,6 +12,8 @@ import androidx.work.WorkerParameters;
  */
 public class UserSentimentSyncWorker extends Worker {
 
+    private static final int MAX_RUN_ATTEMPTS = 3;
+
     private final AssetSentimentRepository repository;
 
     @WorkerInject
@@ -24,6 +26,9 @@ public class UserSentimentSyncWorker extends Worker {
 
     @Override
     public Result doWork() {
+        if (getRunAttemptCount() > MAX_RUN_ATTEMPTS) {
+            return Result.failure();
+        }
         if (repository.syncPendingSentiments()) {
             return Result.success();
         }
