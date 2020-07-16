@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#D60B41</color>
     <color name="colorAccent">#FF1744</color>
     <color name="addAccountButtonText">#FFFFFF</color>
+    <color name="background">#141414</color>
+    <color name="text">#D2D2D2</color>
+    <color name="navigationBarBackground">#161616</color>
+    <color name="navigationBarUnselected">#969696</color>
 </resources>

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".usecase.home.HomeFragment">
+    android:background="@color/background"
+    tools:context=".usecase.assetList.AssetListFragment">
 
     <TextView
         android:id="@+id/movies_label"
@@ -14,6 +15,7 @@
         android:layout_marginTop="@dimen/bigPadding"
         android:text="@string/movies_label"
         android:textSize="@dimen/title_font_size"
+        android:textColor="@color/text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -36,6 +38,7 @@
         android:layout_marginTop="@dimen/bigPadding"
         android:text="@string/tvshows_label"
         android:textSize="@dimen/title_font_size"
+        android:textColor="@color/text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/movies_list" />
 
