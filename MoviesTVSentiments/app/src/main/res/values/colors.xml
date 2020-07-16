@@ -8,4 +8,5 @@
     <color name="text">#D2D2D2</color>
     <color name="navigationBarBackground">#161616</color>
     <color name="navigationBarUnselected">#969696</color>
+    <color name="white">#FFFFFF</color>
 </resources>

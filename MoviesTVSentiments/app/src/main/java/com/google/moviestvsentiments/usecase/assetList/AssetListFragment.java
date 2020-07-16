@@ -1,6 +1,7 @@
 package com.google.moviestvsentiments.usecase.assetList;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +32,13 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
     AssetSentimentViewModel viewModel;
 
     private String accountName;
+    private AssetReactSheet assetReactSheet;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.asset_lists_screen, container, false);
+        assetReactSheet = AssetReactSheet.create(getContext(), inflater);
         AssetListScreen assetListScreen = AssetListScreen.create(this, root,
                 container.getContext());
 
@@ -71,5 +74,17 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
         intent.putExtra(EXTRA_ACCOUNT_NAME, accountName);
         intent.putExtra(EXTRA_ASSET_SENTIMENT, assetSentiment);
         startActivity(intent);
+    }
+
+    /**
+     * Displays a BottomSheetDialog containing a few details about the selected Asset and options
+     * to change the sentiment on the Asset.
+     * @param assetSentiment The selected AssetSentiment.
+     * @param posterDrawable The Drawable of the poster image.
+     */
+    @Override
+    public void onAssetLongClick(AssetSentiment assetSentiment, Drawable posterDrawable) {
+        assetReactSheet.bind(assetSentiment, posterDrawable);
+        assetReactSheet.show();
     }
 }
