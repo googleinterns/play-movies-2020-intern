@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="bigPadding">16dp</dimen>
+    <dimen name="smallPadding">4dp</dimen>
     <dimen name="title_font_size">20sp</dimen>
+    <dimen name="asset_card_width">135dp</dimen>
+    <dimen name="asset_card_height">200dp</dimen>
+    <dimen name="asset_react_sheet_width">54dp</dimen>
+    <dimen name="asset_react_sheet_height">80dp</dimen>
 </resources>

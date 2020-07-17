@@ -12,8 +12,8 @@
 
         <ImageView
             android:id="@+id/asset_card_image"
-            android:layout_width="135dp"
-            android:layout_height="200dp"
+            android:layout_width="@dimen/asset_card_width"
+            android:layout_height="@dimen/asset_card_height"
             android:scaleType="centerCrop" />
 
 

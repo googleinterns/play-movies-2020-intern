@@ -1,5 +1,6 @@
 package com.google.moviestvsentiments.usecase.assetList;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,12 +29,21 @@ public class AssetListAdapter extends RecyclerView.Adapter<AssetListAdapter.Asse
          *                       current user's sentiment toward that asset.
          */
         void onAssetClick(AssetSentiment assetSentiment);
+
+        /**
+         * Handles an Asset in the Asset list being long clicked.
+         * @param assetSentiment An AssetSentiment object containing the clicked Asset and the
+         *                       current user's sentiment toward that Asset.
+         * @param posterDrawable The Drawable of the Asset's poster image.
+         */
+        void onAssetLongClick(AssetSentiment assetSentiment, Drawable posterDrawable);
     }
 
     /**
      * A container that holds metadata about an item view in the asset list.
      */
-    static class AssetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class AssetViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            View.OnLongClickListener {
 
         private final ImageView imageView;
         private final AssetClickListener assetClickListener;
@@ -42,6 +52,7 @@ public class AssetListAdapter extends RecyclerView.Adapter<AssetListAdapter.Asse
         private AssetViewHolder(@NonNull View itemView, AssetClickListener assetClickListener) {
             super(itemView);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
             imageView = itemView.findViewById(R.id.asset_card_image);
             this.assetClickListener = assetClickListener;
         }
@@ -60,6 +71,12 @@ public class AssetListAdapter extends RecyclerView.Adapter<AssetListAdapter.Asse
         @Override
         public void onClick(View view) {
             assetClickListener.onAssetClick(assetSentiment);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            assetClickListener.onAssetLongClick(assetSentiment, imageView.getDrawable());
+            return true;
         }
     }
 
