@@ -23,7 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint;
  * arguments.
  */
 @AndroidEntryPoint
-public class AssetListFragment extends Fragment implements AssetListAdapter.AssetClickListener {
+public class AssetListFragment extends Fragment implements AssetListAdapter.AssetClickListener,
+        AssetReactSheet.ReactSheetClickListener {
 
     public static final String EXTRA_ACCOUNT_NAME = "com.google.moviestvsentiments.ACCOUNT_NAME";
     public static final String EXTRA_ASSET_SENTIMENT = "com.google.moviestvsentiments.ASSET_SENTIMENT";
@@ -38,7 +39,7 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.asset_lists_screen, container, false);
-        assetReactSheet = AssetReactSheet.create(getContext(), inflater);
+        assetReactSheet = AssetReactSheet.create(this, getContext(), inflater);
         AssetListScreen assetListScreen = AssetListScreen.create(this, root,
                 container.getContext());
 
@@ -86,5 +87,19 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
     public void onAssetLongClick(AssetSentiment assetSentiment, Drawable posterDrawable) {
         assetReactSheet.bind(assetSentiment, posterDrawable);
         assetReactSheet.show();
+    }
+
+    /**
+     * Updates the UserSentiment to match the provided AssetSentiment and SentimentType.
+     * @param assetSentiment The AssetSentiment that is being reacted to.
+     * @param clickedSentiment The SentimentType on the AssetReactSheet that was clicked.
+     */
+    @Override
+    public void onReactSheetClick(AssetSentiment assetSentiment, SentimentType clickedSentiment) {
+        if (clickedSentiment == assetSentiment.sentimentType()) {
+            clickedSentiment = SentimentType.UNSPECIFIED;
+        }
+        viewModel.updateSentiment(accountName, assetSentiment.asset().id(),
+                assetSentiment.asset().type(), clickedSentiment);
     }
 }
