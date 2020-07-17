@@ -3,8 +3,10 @@ package com.google.moviestvsentiments.usecase.signin;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.model.Account;
@@ -37,13 +39,17 @@ class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.Account
     static class AccountViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private boolean addAccount;
-        private final TextView textView;
+        private final ImageView iconView;
+        private final TextView iconTextView;
+        private final TextView nameTextView;
         private final AccountClickListener accountClickListener;
 
         private AccountViewHolder(View itemView, AccountClickListener accountClickListener) {
             super(itemView);
             itemView.setOnClickListener(this);
-            textView = itemView.findViewById(R.id.accountTextView);
+            iconView = itemView.findViewById(R.id.accountIcon);
+            iconTextView = itemView.findViewById(R.id.accountIconText);
+            nameTextView = itemView.findViewById(R.id.accountTextView);
             this.accountClickListener = accountClickListener;
         }
 
@@ -52,17 +58,32 @@ class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.Account
          * @param addAccount Indicates whether clicking this item view should initiate the process
          *                   of adding a new account name.
          * @param text The text to display in the item view.
+         * @param colorId The tint color to use for the icon view.
          */
-        private void bind(boolean addAccount, String text) {
+        private void bind(boolean addAccount, String text, int colorId) {
             this.addAccount = addAccount;
-            textView.setText(text);
+            nameTextView.setText(text);
+            if (addAccount) {
+                iconTextView.setVisibility(View.GONE);
+                iconView.setImageDrawable(iconView.getContext().getDrawable(R.drawable.ic_baseline_person_add_24));
+                iconView.setTag(R.drawable.ic_baseline_person_add_24);
+            } else {
+                iconTextView.setText(text.substring(0, 1).toUpperCase());
+                iconTextView.setVisibility(View.VISIBLE);
+                iconView.setImageDrawable(iconView.getContext().getDrawable(R.drawable.circle));
+                iconView.setTag(R.drawable.circle);
+            }
+            iconView.setColorFilter(ContextCompat.getColor(iconView.getContext(), colorId));
         }
 
         @Override
         public void onClick(View view) {
-            accountClickListener.onAccountClick(addAccount, textView.getText().toString());
+            accountClickListener.onAccountClick(addAccount, nameTextView.getText().toString());
         }
     }
+
+    private static int[] ACCOUNT_ICON_COLORS = new int[] {R.color.red, R.color.purple, R.color.blue,
+            R.color.green};
 
     private List<Account> accounts;
     private AccountClickListener accountClickListener;
@@ -100,9 +121,10 @@ class AccountListAdapter extends RecyclerView.Adapter<AccountListAdapter.Account
     @Override
     public void onBindViewHolder(AccountViewHolder holder, int position) {
         if (position < accounts.size()) {
-            holder.bind(false, accounts.get(position).name());
+            holder.bind(false, accounts.get(position).name(),
+                    ACCOUNT_ICON_COLORS[position % ACCOUNT_ICON_COLORS.length]);
         } else {
-            holder.bind(true, "Add Account");
+            holder.bind(true, "Add Account", R.color.white);
         }
     }
 

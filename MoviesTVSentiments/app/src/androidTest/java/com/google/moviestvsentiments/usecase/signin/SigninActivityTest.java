@@ -7,10 +7,13 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAssertion.withItemCount;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.equalTo;
 
 import android.app.Activity;
 import android.app.Instrumentation.ActivityResult;
@@ -23,6 +26,7 @@ import dagger.hilt.android.testing.HiltAndroidTest;
 import dagger.hilt.android.testing.UninstallModules;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.espresso.matcher.ViewMatchers;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
 import com.google.moviestvsentiments.di.WebModule;
@@ -42,6 +46,18 @@ public class SigninActivityTest {
     public void signinActivity_displaysOnlyAddAccount() {
         onView(withId(R.id.accountList)).check(withItemCount(1));
         onView(withId(R.id.accountTextView)).check(matches(withText("Add Account")));
+    }
+
+    @Test
+    public void addAccount_displaysCorrectIcon() {
+        onView(withId(R.id.accountIcon)).check(matches(withTagValue(equalTo(
+                R.drawable.ic_baseline_person_add_24))));
+    }
+
+    @Test
+    public void addAccount_hidesIconTextView() {
+        onView(withId(R.id.accountIconText)).check(matches(withEffectiveVisibility(
+                ViewMatchers.Visibility.GONE)));
     }
 
     @Test
@@ -72,6 +88,8 @@ public class SigninActivityTest {
         onView(withId(R.id.accountTextView)).perform(click());
 
         onView(withId(R.id.accountList)).check(withItemCount(2));
+        onView(allOf(withId(R.id.accountIconText), withEffectiveVisibility(
+                ViewMatchers.Visibility.VISIBLE))).check(matches(withText("A")));
     }
 
     @Test
