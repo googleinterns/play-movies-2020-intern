@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <ImageView
+        android:id="@+id/accountIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/bigPadding"
+        android:layout_marginTop="@dimen/bigPadding"
+        android:src="@drawable/circle"
+        android:tint="@color/navigationBarUnselected"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/accountIconText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text"
+        android:textSize="@dimen/accountIconTextSize"
+        app:layout_constraintBottom_toBottomOf="@id/accountIcon"
+        app:layout_constraintEnd_toEndOf="@id/accountIcon"
+        app:layout_constraintStart_toStartOf="@id/accountIcon"
+        app:layout_constraintTop_toTopOf="@id/accountIcon" />
 
     <TextView
         android:id="@+id/accountTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/bigPadding"
+        android:textColor="@color/text"
+        app:layout_constraintTop_toTopOf="@id/accountIcon"
+        app:layout_constraintBottom_toBottomOf="@id/accountIcon"
+        app:layout_constraintStart_toEndOf="@id/accountIcon" />
 
-</LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        android:layout_marginTop="@dimen/bigPadding"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/accountIcon" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
