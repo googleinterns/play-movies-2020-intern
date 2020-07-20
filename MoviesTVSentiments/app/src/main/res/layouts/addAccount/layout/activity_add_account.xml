@@ -4,27 +4,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".usecase.addAccount.AddAccount">
+    android:background="@color/background"
+    tools:context=".usecase.addAccount.AddAccountActivity">
 
     <EditText
         android:id="@+id/editAccountName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/bigPadding"
+        android:autofillHints="personName"
         android:fontFamily="sans-serif-light"
         android:hint="@string/addAccountHint"
         android:inputType="textPersonName"
+        android:textColor="@color/text"
+        android:textColorHint="@color/text"
+        android:backgroundTint="@color/text"
         android:textSize="18sp"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="@dimen/bigPadding"
-        android:autofillHints="personName" />
+        tools:layout_editor_absoluteX="@dimen/bigPadding" />
 
     <Button
         android:id="@+id/addAccountButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/bigPadding"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorPrimaryDark"
         android:text="@string/addAccountSave"
         android:textColor="@color/addAccountButtonText"
         app:layout_constraintEnd_toEndOf="parent"
