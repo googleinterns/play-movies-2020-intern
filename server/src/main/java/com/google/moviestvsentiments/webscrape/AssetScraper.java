@@ -48,11 +48,23 @@ public class AssetScraper {
         @Key("Year") public String year;
     }
 
+    /**
+     * Represents a response from the Google custom search for banner images.
+     */
+    public static class ImageSearchResponse {
+        public static class Item {
+            @Key public String link;
+        }
+        @Key public List<Item> items;
+    }
+
     private static final String IMDB_ASSET_XPATH = "//td[@class='titleColumn']/a";
     private static final String IMDB_ASSET_URL_PREFIX = "/title/";
     private static final String OMDB_MOVIE_TYPE = "movie";
     private static final String OMDB_SHOW_TYPE = "series";
     private static final String OMDB_ROTTEN_TOMATOES_SOURCE = "Rotten Tomatoes";
+    private static final String BANNER_SEARCH_FORMAT = "https://www.googleapis.com/customsearch/v1?num=1&" +
+            "imgSize=large&searchType=image&cx=014855773548463262652:6dh_g-lgcra&key=%s&q=%s+banner+image";
 
     private final Clock clock;
     private final HttpRequestFactory requestFactory;
@@ -151,5 +163,25 @@ public class AssetScraper {
                 .findAny().ifPresent(rating -> asset.setRottenTomatoesRating(rating.value));
 
         return Optional.of(asset);
+    }
+
+    /**
+     * Returns the banner image URL for the given Asset. Uses the Google Custom Search JSON API to search for the Asset
+     * title, along with the phrase "banner image" and returns the URL of the first image result.
+     * @param apiKey The Google Cloud API key to use when invoking the Custom Search API.
+     * @param asset The Asset to find banner images for.
+     * @return The banner image URL for the given Asset.
+     * @throws IOException If calling the Custom Search API fails.
+     */
+    public String scrapeBannerUrl(String apiKey, Asset asset) throws IOException {
+        WebClient client = new WebClient();
+        client.getOptions().setCssEnabled(false);
+        client.getOptions().setJavaScriptEnabled(false);
+
+        String searchUrl = String.format(BANNER_SEARCH_FORMAT, apiKey, asset.getTitle());
+        HttpRequest request = requestFactory.buildGetRequest(new GenericUrl(searchUrl));
+        ImageSearchResponse responseList = request.execute().parseAs(ImageSearchResponse.class);
+
+        return responseList.items.get(0).link;
     }
 }
