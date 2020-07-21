@@ -65,7 +65,7 @@ public class Asset {
 
     private String title;
     private String poster;
-    private String banner;
+    @Lob private String banner;
     private String imdbRating;
     private String rottenTomatoesRating;
     @Lob private String plot;

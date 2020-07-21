@@ -1,11 +1,12 @@
 package com.google.moviestvsentiments.webscrape;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,7 +30,8 @@ public class AssetScrapeControllerTest {
 
     private static final String OMDB_URL = "testurl";
     private static final String API_KEY = "testApiKey";
-    private static final String TEST_URL = "/scrape?url=" + OMDB_URL + "&apiKey=" + API_KEY;
+    private static final String SCRAPE_ASSETS_TEST_URL = "/scrape?url=" + OMDB_URL + "&apiKey=" + API_KEY;
+    private static final String SCRAPE_BANNERS_TEST_URL = "/banners?apiKey=" + API_KEY;
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,11 +50,11 @@ public class AssetScrapeControllerTest {
         when(scraper.scrapeIds(OMDB_URL)).thenReturn(assetIds);
         when(scraper.scrapeAssets(assetIds, API_KEY)).thenReturn(assets);
 
-        mockMvc.perform(get(TEST_URL));
+        mockMvc.perform(get(SCRAPE_ASSETS_TEST_URL));
 
-        verify(scraper, times(1)).scrapeIds(OMDB_URL);
-        verify(scraper, times(1)).scrapeAssets(assetIds, API_KEY);
-        verify(repository, times(1)).saveAll(assets);
+        verify(scraper).scrapeIds(OMDB_URL);
+        verify(scraper).scrapeAssets(assetIds, API_KEY);
+        verify(repository).saveAll(assets);
         verifyNoMoreInteractions(scraper, repository);
     }
 
@@ -64,7 +66,7 @@ public class AssetScrapeControllerTest {
         when(scraper.scrapeIds(OMDB_URL)).thenReturn(assetIds);
         when(scraper.scrapeAssets(assetIds, API_KEY)).thenReturn(assets);
 
-        mockMvc.perform(get(TEST_URL)).andExpect(status().isOk());
+        mockMvc.perform(get(SCRAPE_ASSETS_TEST_URL)).andExpect(status().isOk());
     }
 
     @Test
@@ -72,8 +74,31 @@ public class AssetScrapeControllerTest {
         final String errorMessage = "Failed to scrape Asset ids";
         when(scraper.scrapeIds(OMDB_URL)).thenThrow(new IOException(errorMessage));
 
-        mockMvc.perform(get(TEST_URL))
+        mockMvc.perform(get(SCRAPE_ASSETS_TEST_URL))
                 .andExpect(status().is5xxServerError())
                 .andExpect(jsonPath("$", equalTo(errorMessage)));
+    }
+
+    @Test
+    public void scrapeBanners_successful_savesAsset() throws Exception {
+        final String bannerUrl = "testBannerUrl";
+        Asset asset = AssetUtil.createAsset("assetId1", AssetType.MOVIE, "title1");
+        when(repository.getAssetsWithoutBanner()).thenReturn(Arrays.asList(asset));
+        when(scraper.scrapeBannerUrl(API_KEY, asset)).thenReturn(bannerUrl);
+
+        mockMvc.perform(put(SCRAPE_BANNERS_TEST_URL));
+
+        assertThat(asset.getBanner()).isEqualTo(bannerUrl);
+        verify(repository).save(asset);
+    }
+
+    @Test
+    public void scrapeBanners_failure_returnsAssetId() throws Exception {
+        Asset asset = AssetUtil.createAsset("assetId1", AssetType.MOVIE, "title1");
+        when(repository.getAssetsWithoutBanner()).thenReturn(Arrays.asList(asset));
+        when(scraper.scrapeBannerUrl(API_KEY, asset)).thenThrow(new RuntimeException("Scrape failure"));
+
+        mockMvc.perform(put(SCRAPE_BANNERS_TEST_URL))
+                .andExpect(jsonPath("$[0]", equalTo("assetId1")));
     }
 }

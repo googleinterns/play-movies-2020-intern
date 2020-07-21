@@ -11,6 +11,12 @@ import java.util.List;
 public interface AssetSentimentRepository extends PagingAndSortingRepository<Asset, Asset.AssetCompositeKey> {
 
     /**
+     * Returns a list of Assets that have a null banner image URL.
+     */
+    @Query("SELECT asset FROM Asset asset WHERE asset.banner IS NULL")
+    List<Asset> getAssetsWithoutBanner();
+
+    /**
      * Returns a list of AssetSentiments with reactions that match the given account name and sentiment type.
      * @param assetType The type of asset to include in the results.
      * @param accountName The account name to use when checking assets for sentiments.
