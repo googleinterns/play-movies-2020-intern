@@ -3,6 +3,7 @@ package com.google.moviestvsentiments.usecase.details;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -11,6 +12,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import android.content.Intent;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
@@ -63,10 +65,14 @@ public class DetailsActivityTest {
     @Parameters(method = "displaysAssetInfoValues")
     public void detailsActivity_displaysAssetInfo(SentimentType sentimentType) {
         final String title = "Asset Title";
+        final String year = "1977";
+        final String runtime = "39 min";
         final String plot = "Description of the plot";
         final String imdbRating = "4.7";
-        Asset asset = AssetUtil.defaultMovieBuilder("assetId").setTitle(title).setPlot(plot)
-                .setImdbRating(imdbRating).build();
+        final String rottenTomatoesRating = "97%";
+        Asset asset = AssetUtil.defaultMovieBuilder("assetId").setTitle(title).setYear(year)
+                .setRuntime(runtime).setPlot(plot).setImdbRating(imdbRating)
+                .setRottenTomatoesRating(rottenTomatoesRating).build();
         AssetSentiment assetSentiment = AssetSentiment.create(asset, sentimentType);
         Intent intent = new Intent();
         intent.putExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, assetSentiment);
@@ -74,8 +80,25 @@ public class DetailsActivityTest {
         activityTestRule.launchActivity(intent);
 
         onView(withId(R.id.asset_title)).check(matches(withText(title)));
+        onView(withId(R.id.asset_details)).check(matches(withText(year +
+                DetailsActivity.DETAILS_SEPARATOR + runtime)));
         onView(withId(R.id.description)).check(matches(withText(plot)));
-        onView(withId(R.id.rating)).check(matches(withText(imdbRating)));
+        onView(withId(R.id.imdb_rating)).check(matches(withText(imdbRating)));
+        onView(withId(R.id.rt_rating)).check(matches(withText(rottenTomatoesRating)));
+    }
+
+    @Test
+    public void detailsActivity_nullRottenTomatoesRating_hidesRottenTomatoes() {
+        Asset asset = AssetUtil.defaultMovieBuilder("assetId").build();
+
+        AssetSentiment assetSentiment = AssetSentiment.create(asset, SentimentType.THUMBS_UP);
+        Intent intent = new Intent();
+        intent.putExtra(AssetListFragment.EXTRA_ASSET_SENTIMENT, assetSentiment);
+
+        activityTestRule.launchActivity(intent);
+
+        onView(withId(R.id.rt_icon)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.rt_rating)).check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
     }
 
     private Object[] displaysSentimentValues() {

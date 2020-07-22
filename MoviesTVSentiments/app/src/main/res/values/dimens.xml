@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="bigPadding">16dp</dimen>
+    <dimen name="mediumPadding">8dp</dimen>
     <dimen name="smallPadding">4dp</dimen>
     <dimen name="title_font_size">20sp</dimen>
     <dimen name="asset_card_width">135dp</dimen>
@@ -9,4 +10,6 @@
     <dimen name="asset_react_sheet_height">80dp</dimen>
     <dimen name="accountListIconRadius">30dp</dimen>
     <dimen name="accountIconTextSize">16sp</dimen>
+    <dimen name="asset_poster_corner_radius">8dp</dimen>
+    <dimen name="asset_poster_small_corner_radius">4dp</dimen>
 </resources>

@@ -23,6 +23,8 @@ import dagger.hilt.android.AndroidEntryPoint;
 @AndroidEntryPoint
 public class DetailsActivity extends AppCompatActivity implements View.OnClickListener {
 
+    public static final String DETAILS_SEPARATOR = " • ";
+
     @Inject
     AssetSentimentViewModel viewModel;
 
@@ -44,20 +46,34 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
      * AssetSentiment and sets the onClickListener for the thumbs up and thumbs down ImageViews.
      */
     private void bind() {
+        Asset asset = assetSentiment.asset();
+
         ImageView banner = findViewById(R.id.banner_image);
-        Glide.with(this).load(assetSentiment.asset().banner()).into(banner);
+        Glide.with(this).load(asset.banner()).into(banner);
 
         ImageView poster = findViewById(R.id.poster_image);
-        Glide.with(this).load(assetSentiment.asset().poster()).into(poster);
+        poster.setClipToOutline(true);
+        Glide.with(this).load(asset.poster()).into(poster);
 
         TextView title = findViewById(R.id.asset_title);
-        title.setText(assetSentiment.asset().title());
+        title.setText(asset.title());
 
-        TextView rating = findViewById(R.id.rating);
-        rating.setText(assetSentiment.asset().imdbRating());
+        TextView details = findViewById(R.id.asset_details);
+        details.setText(asset.year() + DETAILS_SEPARATOR + asset.runtime());
+
+        TextView imdbRating = findViewById(R.id.imdb_rating);
+        imdbRating.setText(asset.imdbRating());
+
+        if (asset.rottenTomatoesRating() != null) {
+            ImageView rottenTomatoesIcon = findViewById(R.id.rt_icon);
+            rottenTomatoesIcon.setVisibility(View.VISIBLE);
+            TextView rottenTomatoesRating = findViewById(R.id.rt_rating);
+            rottenTomatoesRating.setText(asset.rottenTomatoesRating());
+            rottenTomatoesRating.setVisibility(View.VISIBLE);
+        }
 
         TextView description = findViewById(R.id.description);
-        description.setText(assetSentiment.asset().plot());
+        description.setText(asset.plot());
 
         ImageView thumbsUp = findViewById(R.id.thumbs_up);
         thumbsUp.setOnClickListener(this);

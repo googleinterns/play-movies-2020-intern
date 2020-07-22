@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background"
     android:scrollbars="none">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".usecase.details.DetailsActivity">
@@ -16,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.25" />
+            app:layout_constraintGuide_percent="0.3" />
 
         <ImageView
             android:id="@+id/banner_image"
@@ -27,6 +28,27 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Space
+            android:id="@+id/banner_gradient_guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/mediumPadding"
+            app:layout_constraintBottom_toTopOf="@id/poster_margin_space"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <View
+            android:id="@+id/banner_gradient"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/background"
+            android:alpha="0.75"
+            app:layout_constraintTop_toTopOf="@id/banner_gradient_guide"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/banner_bottom_guideline"/>
 
         <Space
             android:id="@+id/poster_margin_space"
@@ -44,6 +66,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginLeft="32dp"
             android:scaleType="centerCrop"
+            android:background="@drawable/rounded_corners"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/poster_margin_space" />
 
@@ -51,30 +74,38 @@
             android:id="@+id/asset_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginLeft="@dimen/bigPadding"
             android:text="Movie/Show Name"
             android:textColor="@color/text"
-            android:textSize="16sp"
+            android:textSize="20sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/poster_image"
-            app:layout_constraintTop_toBottomOf="@id/banner_image" />
+            app:layout_constraintTop_toTopOf="@id/poster_image" />
 
         <TextView
-            android:id="@+id/rating"
+            android:id="@+id/asset_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="4dp"
-            android:text="Rating"
+            android:layout_marginTop="@dimen/mediumPadding"
             android:textColor="@color/text"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintStart_toEndOf="@id/poster_image"
+            android:text="Details"
+            app:layout_constraintStart_toStartOf="@id/asset_title"
             app:layout_constraintTop_toBottomOf="@id/asset_title" />
 
+        <TextView
+            android:id="@+id/imdb_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/smallPadding"
+            android:text="Rating"
+            android:textColor="@color/text"
+            app:layout_constraintStart_toStartOf="@id/asset_details"
+            app:layout_constraintTop_toBottomOf="@id/asset_details" />
+
         <ImageView
+            android:id="@+id/imdb_icon"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
             android:layout_marginTop="2dp"
@@ -82,9 +113,34 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_star_24"
             android:tint="@color/navigationBarUnselected"
-            app:layout_constraintBottom_toBottomOf="@id/rating"
-            app:layout_constraintStart_toEndOf="@id/rating"
-            app:layout_constraintTop_toTopOf="@id/rating" />
+            app:layout_constraintBottom_toBottomOf="@id/imdb_rating"
+            app:layout_constraintStart_toEndOf="@id/imdb_rating"
+            app:layout_constraintTop_toTopOf="@id/imdb_rating" />
+
+        <ImageView
+            android:id="@+id/rt_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="@dimen/bigPadding"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_tomato"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@id/imdb_icon"
+            app:layout_constraintTop_toTopOf="@id/rt_rating"
+            app:layout_constraintBottom_toBottomOf="@id/rt_rating" />
+
+        <TextView
+            android:id="@+id/rt_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RT Rating"
+            android:textColor="@color/text"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@id/rt_icon"
+            app:layout_constraintTop_toTopOf="@id/imdb_rating"
+            app:layout_constraintBottom_toBottomOf="@id/imdb_rating" />
 
         <View
             android:id="@+id/top_line"

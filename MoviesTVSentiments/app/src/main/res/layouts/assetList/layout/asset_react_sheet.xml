@@ -13,6 +13,7 @@
         android:scaleType="centerCrop"
         android:layout_marginTop="@dimen/bigPadding"
         android:layout_marginLeft="@dimen/bigPadding"
+        android:background="@drawable/small_rounded_corners"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

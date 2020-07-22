@@ -159,7 +159,7 @@ public class AssetScraper {
             return Optional.empty();
         }
 
-        omdbResponse.ratings.stream().filter(rating -> OMDB_ROTTEN_TOMATOES_SOURCE.equals(rating))
+        omdbResponse.ratings.stream().filter(rating -> OMDB_ROTTEN_TOMATOES_SOURCE.equals(rating.source))
                 .findAny().ifPresent(rating -> asset.setRottenTomatoesRating(rating.value));
 
         return Optional.of(asset);

@@ -52,6 +52,7 @@ public class AssetReactSheet {
 
         View assetReactSheet = inflater.inflate(R.layout.asset_react_sheet, null);
         image = assetReactSheet.findViewById(R.id.react_sheet_image);
+        image.setClipToOutline(true);
         title = assetReactSheet.findViewById(R.id.react_sheet_title);
         details = assetReactSheet.findViewById(R.id.react_sheet_details);
         thumbsUpIcon = assetReactSheet.findViewById(R.id.react_sheet_thumbs_up);
