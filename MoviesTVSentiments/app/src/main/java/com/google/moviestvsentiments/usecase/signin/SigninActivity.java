@@ -1,6 +1,7 @@
 package com.google.moviestvsentiments.usecase.signin;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
@@ -39,6 +40,10 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
                 finish();
             }
         });
+
+        Toolbar toolbar = findViewById(R.id.signinToolbar);
+        toolbar.setTitle(this.getString(R.string.signinTitle));
+        setSupportActionBar(toolbar);
 
         RecyclerView accountList = findViewById(R.id.accountList);
         accountList.setHasFixedSize(true);
