@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/hamburgerHeaderHeight"
+    android:background="@color/navigationBarBackground">
+
+    <ImageView
+        android:id="@+id/hamburgerAccountIcon"
+        android:layout_width="@dimen/accountIconRadiusHamburger"
+        android:layout_height="@dimen/accountIconRadiusHamburger"
+        android:layout_marginStart="@dimen/bigPadding"
+        android:layout_marginBottom="@dimen/mediumPadding"
+        android:src="@drawable/circle"
+        android:tint="@color/colorPrimaryDark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/hamburgerAccountName" />
+
+    <TextView
+        android:id="@+id/hamburgerAccountIconText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/accountIconTextSizeHamburger"
+        app:layout_constraintBottom_toBottomOf="@id/hamburgerAccountIcon"
+        app:layout_constraintEnd_toEndOf="@id/hamburgerAccountIcon"
+        app:layout_constraintStart_toStartOf="@id/hamburgerAccountIcon"
+        app:layout_constraintTop_toTopOf="@id/hamburgerAccountIcon" />
+
+    <TextView
+        android:id="@+id/hamburgerAccountName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textSize="@dimen/hamburgerAccountNameTextSize"
+        android:layout_marginBottom="@dimen/mediumPadding"
+        app:layout_constraintStart_toStartOf="@id/hamburgerAccountIcon"
+        app:layout_constraintBottom_toTopOf="@id/separator" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
