@@ -9,4 +9,7 @@
     <string name="tvshows_label">TV Shows</string>
     <string name="likeThisLabel">Like this</string>
     <string name="dislikeThisLabel">Dislike this</string>
+    <string name="open_drawer">Open Navigation Drawer</string>
+    <string name="close_drawer">Close Navigation Drawer</string>
+    <string name="signoutLabel">Sign Out</string>
 </resources>

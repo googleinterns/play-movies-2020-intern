@@ -7,10 +7,21 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="actionBarStyle">@style/DarkActionBar</item>
         <item name="android:statusBarColor">@color/navigationBarBackground</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="DarkActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="background">@color/navigationBarBackground</item>
+    </style>
+
+    <style name="ToolbarStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+    </style>
+
+    <style name="HamburgerItem" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">@dimen/hamburgerItemTextSize</item>
     </style>
 
 </resources>
