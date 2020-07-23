@@ -12,4 +12,5 @@
     <string name="open_drawer">More options</string>
     <string name="close_drawer">Close Navigation Drawer</string>
     <string name="signoutLabel">Sign Out</string>
+    <string name="signinTitle">Sign In</string>
 </resources>
