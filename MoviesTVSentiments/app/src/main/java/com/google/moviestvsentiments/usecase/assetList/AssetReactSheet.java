@@ -148,4 +148,13 @@ public class AssetReactSheet {
     public void show() {
         sheetDialog.show();
     }
+
+    /**
+     * Dismisses the AssetReactSheet.
+     */
+    public void dismiss() {
+        if (sheetDialog.isShowing()) {
+            sheetDialog.dismiss();
+        }
+    }
 }
