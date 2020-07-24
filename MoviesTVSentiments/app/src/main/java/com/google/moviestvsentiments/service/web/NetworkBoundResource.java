@@ -18,7 +18,7 @@ public abstract class NetworkBoundResource<ServerType, LocalType> {
      * may or may not trigger a network request.
      */
     public NetworkBoundResource() {
-        result.setValue(Resource.loading(null));
+        result.postValue(Resource.loading(null));
         LiveData<LocalType> dbSource = loadFromRoom();
         result.addSource(dbSource, data -> {
             result.removeSource(dbSource);
@@ -80,7 +80,7 @@ public abstract class NetworkBoundResource<ServerType, LocalType> {
      */
     private void setValue(Resource<LocalType> newValue) {
         if (!Objects.equals(result.getValue(), newValue)) {
-            result.setValue(newValue);
+            result.postValue(newValue);
         }
     }
 

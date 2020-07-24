@@ -120,7 +120,7 @@ public abstract class AssetSentimentDao {
         if (other.getValue() != null) {
             result.addAll(other.getValue());
         }
-        mediator.setValue(result);
+        mediator.postValue(result);
     }
 
     /**
