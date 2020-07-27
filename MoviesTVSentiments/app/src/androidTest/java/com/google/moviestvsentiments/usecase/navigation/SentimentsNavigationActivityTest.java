@@ -6,15 +6,21 @@ import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
-import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.common.truth.Truth.assertThat;
+import static org.hamcrest.Matchers.allOf;
 
 import android.content.Intent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.intent.Intents;
 import com.google.moviestvsentiments.R;
 import com.google.moviestvsentiments.di.DatabaseModule;
@@ -23,6 +29,9 @@ import com.google.moviestvsentiments.model.Account;
 import com.google.moviestvsentiments.service.account.AccountDao;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import com.google.moviestvsentiments.util.LiveDataTestUtil;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -69,7 +78,7 @@ public class SentimentsNavigationActivityTest {
 
     @Test
     public void hamburgerMenu_bindsCorrectly() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        openActionBarOverflowOrOptionsMenu(ApplicationProvider.getApplicationContext());
 
         onView(withId(R.id.hamburgerAccountName)).check(matches(withText(ACCOUNT_NAME)));
         onView(withId(R.id.hamburgerAccountIconText)).check(matches(
@@ -78,10 +87,26 @@ public class SentimentsNavigationActivityTest {
 
     @Test
     public void hamburgerMenu_selectSignOut_clearsCurrentAccount() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        ViewInteraction appCompatImageButton = onView(
+                allOf(withContentDescription("More options"),
+                        childAtPosition(
+                                allOf(withId(R.id.toolbar),
+                                        childAtPosition(
+                                                withId(R.id.app_bar),
+                                                0)),
+                                1),
+                        isDisplayed()));
+        appCompatImageButton.perform(click());
 
-        onView(withText(ApplicationProvider.getApplicationContext()
-                .getString(R.string.signoutLabel))).perform(click());
+        ViewInteraction navigationMenuItemView = onView(
+                allOf(childAtPosition(
+                        allOf(withId(R.id.design_navigation_view),
+                                childAtPosition(
+                                        withId(R.id.hamburger_nav),
+                                        0)),
+                        1),
+                        isDisplayed()));
+        navigationMenuItemView.perform(click());
 
         Account account = LiveDataTestUtil.getValue(accountDao.getCurrentAccount());
         assertThat(account).isNull();
@@ -89,11 +114,46 @@ public class SentimentsNavigationActivityTest {
 
     @Test
     public void hamburgerMenu_selectSignOut_sendsIntentToSigninActivity() {
-        openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
+        ViewInteraction appCompatImageButton = onView(
+                allOf(withContentDescription("More options"),
+                        childAtPosition(
+                                allOf(withId(R.id.toolbar),
+                                        childAtPosition(
+                                                withId(R.id.app_bar),
+                                                0)),
+                                1),
+                        isDisplayed()));
+        appCompatImageButton.perform(click());
 
-        onView(withText(ApplicationProvider.getApplicationContext()
-                .getString(R.string.signoutLabel))).perform(click());
+        ViewInteraction navigationMenuItemView = onView(
+                allOf(childAtPosition(
+                        allOf(withId(R.id.design_navigation_view),
+                                childAtPosition(
+                                        withId(R.id.hamburger_nav),
+                                        0)),
+                        1),
+                        isDisplayed()));
+        navigationMenuItemView.perform(click());
 
         intended(hasComponent(SigninActivity.class.getName()));
+    }
+
+    private static Matcher<View> childAtPosition(
+            final Matcher<View> parentMatcher, final int position) {
+
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
     }
 }

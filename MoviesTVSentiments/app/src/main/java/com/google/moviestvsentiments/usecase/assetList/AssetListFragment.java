@@ -64,6 +64,14 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
         return root;
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (assetReactSheet != null) {
+            assetReactSheet.dismiss();
+        }
+    }
+
     /**
      * Sends an intent containing the current account name and the given AssetSentiment object to
      * the DetailsActivity.
