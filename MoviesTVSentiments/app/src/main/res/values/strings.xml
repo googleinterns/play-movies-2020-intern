@@ -13,4 +13,5 @@
     <string name="close_drawer">Close Navigation Drawer</string>
     <string name="signoutLabel">Sign Out</string>
     <string name="signinTitle">Sign In</string>
+    <string name="offlineToast">Could not fetch data. Continuing in offline mode. Some results may be outdated.</string>
 </resources>

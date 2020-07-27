@@ -7,7 +7,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import com.google.moviestvsentiments.R;
+import com.google.moviestvsentiments.ToastApplication;
 import com.google.moviestvsentiments.service.account.AccountViewModel;
+import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.usecase.addAccount.AddAccountActivity;
 import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActivity;
 import dagger.hilt.android.AndroidEntryPoint;
@@ -54,6 +56,9 @@ public class SigninActivity extends AppCompatActivity implements AccountListAdap
         viewModel.getAlphabetizedAccounts().observe(this, resource -> {
             if (resource.getValue() != null) {
                 adapter.setAccounts(resource.getValue());
+            }
+            if (resource.getStatus() == Resource.Status.ERROR) {
+                ((ToastApplication) getApplication()).displayOfflineToast();
             }
         });
     }

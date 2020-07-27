@@ -7,6 +7,8 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
@@ -14,6 +16,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAssertion.withItemCount;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import android.app.Activity;
 import android.app.Instrumentation.ActivityResult;
@@ -37,10 +40,18 @@ import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActi
 @HiltAndroidTest
 public class SigninActivityTest {
 
+    IntentsTestRule<SigninActivity> intentsRule = new IntentsTestRule<>(SigninActivity.class);
+
     @Rule
     public RuleChain rule = RuleChain.outerRule(new HiltAndroidRule(this))
-            .around(new IntentsTestRule<>(SigninActivity.class))
+            .around(intentsRule)
             .around(new InstantTaskExecutorRule());
+
+    @Test
+    public void serverError_displaysToast() {
+        onView(withText(R.string.offlineToast)).inRoot(withDecorView(not(intentsRule.getActivity()
+                .getWindow().getDecorView()))).check(matches(isDisplayed()));
+    }
 
     @Test
     public void signinActivity_displaysOnlyAddAccount() {

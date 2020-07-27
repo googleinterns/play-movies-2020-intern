@@ -9,10 +9,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.google.moviestvsentiments.R;
+import com.google.moviestvsentiments.ToastApplication;
 import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.service.assetSentiment.AssetSentimentViewModel;
+import com.google.moviestvsentiments.service.web.Resource;
 import com.google.moviestvsentiments.usecase.details.DetailsActivity;
 import com.google.moviestvsentiments.usecase.signin.SigninActivity;
 import javax.inject.Inject;
@@ -52,12 +54,18 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
                 if (moviesResource.getValue() != null) {
                     assetListScreen.setMovies(moviesResource.getValue());
                 }
+                if (moviesResource.getStatus() == Resource.Status.ERROR) {
+                    ((ToastApplication) getActivity().getApplication()).displayOfflineToast();
+                }
             });
 
         viewModel.getAssets(AssetType.SHOW, accountName, sentimentType)
             .observe(getViewLifecycleOwner(), showsResource -> {
                 if (showsResource.getValue() != null) {
                     assetListScreen.setShows(showsResource.getValue());
+                }
+                if (showsResource.getStatus() == Resource.Status.ERROR) {
+                    ((ToastApplication) getActivity().getApplication()).displayOfflineToast();
                 }
             });
 
