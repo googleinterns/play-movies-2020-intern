@@ -7,6 +7,8 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -15,10 +17,12 @@ import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAsse
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
 import com.google.moviestvsentiments.HiltTestActivity;
@@ -70,6 +74,17 @@ public class AssetListFragmentTest {
     @Before
     public void setUp() {
         hiltAndroidRule.inject();
+    }
+
+    @Test
+    public void serverError_displaysOfflineToast() {
+        ActivityScenario activityScenario = HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+                createFragmentArgs(SentimentType.UNSPECIFIED));
+
+        activityScenario.onActivity(activity -> {
+            onView(withText(R.string.offlineToast)).inRoot(withDecorView(not(
+                    activity.getWindow().getDecorView()))).check(matches(isDisplayed()));
+        });
     }
 
     private Object[] startsWithEmptyListValues() {

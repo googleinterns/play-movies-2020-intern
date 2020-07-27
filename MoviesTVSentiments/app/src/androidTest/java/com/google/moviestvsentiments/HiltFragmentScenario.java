@@ -16,11 +16,13 @@ public class HiltFragmentScenario {
      * @param fragmentClass The class of the fragment to instantiate.
      * @param args The arguments to pass to the fragment.
      * @param <F> The type of the fragment.
+     * @return The ActivityScenario used to launch the HiltTestActivity.
      */
-    public static <F extends Fragment> void launchHiltFragment(Class<F> fragmentClass, Bundle args) {
+    public static <F extends Fragment> ActivityScenario launchHiltFragment(Class<F> fragmentClass,
+                                                                           Bundle args) {
         Intent intent = new Intent(ApplicationProvider.getApplicationContext(),
                 HiltTestActivity.class);
-        launchHiltFragmentWithIntent(fragmentClass, intent, args);
+        return launchHiltFragmentWithIntent(fragmentClass, intent, args);
     }
 
     /**
@@ -30,9 +32,10 @@ public class HiltFragmentScenario {
      * @param intent The intent to use when launching the hosting activity.
      * @param args The arguments to pass to the fragment.
      * @param <F> The type of the fragment.
+     * @return The ActivityScenario used to launch the provided intent.
      */
-    public static <F extends Fragment> void launchHiltFragmentWithIntent(Class<F> fragmentClass,
-                                                                     Intent intent, Bundle args) {
+    public static <F extends Fragment> ActivityScenario launchHiltFragmentWithIntent(
+                Class<F> fragmentClass, Intent intent, Bundle args) {
         ActivityScenario<HiltTestActivity> activityScenario = ActivityScenario.launch(intent);
         activityScenario.onActivity(activity -> {
             Fragment fragment = activity.getSupportFragmentManager().getFragmentFactory()
@@ -43,5 +46,6 @@ public class HiltFragmentScenario {
                     .add(android.R.id.content, fragment, null)
                     .commitNow();
         });
+        return activityScenario;
     }
 }

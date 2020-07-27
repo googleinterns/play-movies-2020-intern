@@ -1,6 +1,5 @@
 package com.google.moviestvsentiments;
 
-import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.hilt.work.HiltWorkerFactory;
 import androidx.work.Configuration;
@@ -19,10 +18,12 @@ import dagger.hilt.android.HiltAndroidApp;
  * An application that uses Hilt for dependency injection.
  */
 @HiltAndroidApp
-public class MoviesTVSentimentsApplication extends Application implements Configuration.Provider {
+public class MoviesTVSentimentsApplication extends ToastApplication implements Configuration.Provider {
 
     @Inject
     HiltWorkerFactory workerFactory;
+
+    private boolean toastDisplayed;
 
     @Override
     public void onCreate() {
@@ -47,5 +48,17 @@ public class MoviesTVSentimentsApplication extends Application implements Config
     @Override
     public Configuration getWorkManagerConfiguration() {
         return new Configuration.Builder().setWorkerFactory(workerFactory).build();
+    }
+
+    /**
+     * Displays a toast notifying the user that the app is in offline mode only if the toast
+     * has not already been displayed. This method should only be called on the main thread.
+     */
+    @Override
+    public void displayOfflineToast() {
+        if (!toastDisplayed) {
+            toastDisplayed = true;
+            super.displayOfflineToast();
+        }
     }
 }
