@@ -12,6 +12,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAssertion.withItemCount;
 import static org.hamcrest.Matchers.allOf;
@@ -22,11 +23,13 @@ import static org.hamcrest.Matchers.not;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
-import androidx.test.core.app.ActivityScenario;
+import androidx.fragment.app.Fragment;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
+import androidx.test.rule.ActivityTestRule;
 import com.google.moviestvsentiments.HiltTestActivity;
 import com.google.moviestvsentiments.R;
+import com.google.moviestvsentiments.ToastApplication;
 import com.google.moviestvsentiments.di.DatabaseModule;
 import com.google.moviestvsentiments.di.WebModule;
 import com.google.moviestvsentiments.model.Asset;
@@ -77,14 +80,26 @@ public class AssetListFragmentTest {
     }
 
     @Test
-    public void serverError_displaysOfflineToast() {
-        ActivityScenario activityScenario = HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
-                createFragmentArgs(SentimentType.UNSPECIFIED));
+    public void serverError_displaysOfflineToast() throws Throwable {
+        ((ToastApplication)getInstrumentation().getTargetContext().getApplicationContext())
+                .resetToastDisplayed();
+        ActivityTestRule<HiltTestActivity> activityTestRule =
+                new ActivityTestRule(HiltTestActivity.class, false, false);
+        activityTestRule.launchActivity(null);
+        Fragment fragment = activityTestRule.getActivity().getSupportFragmentManager()
+                .getFragmentFactory().instantiate(AssetListFragment.class.getClassLoader(),
+                        AssetListFragment.class.getName());
+        fragment.setArguments(createFragmentArgs(SentimentType.UNSPECIFIED));
 
-        activityScenario.onActivity(activity -> {
-            onView(withText(R.string.offlineToast)).inRoot(withDecorView(not(
-                    activity.getWindow().getDecorView()))).check(matches(isDisplayed()));
+        activityTestRule.runOnUiThread(() -> {
+            activityTestRule.getActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(android.R.id.content, fragment, null)
+                    .commitNow();
         });
+
+        onView(withText(R.string.offlineToast)).inRoot(withDecorView(not(activityTestRule
+                .getActivity().getWindow().getDecorView()))).check(matches(isDisplayed()));
     }
 
     private Object[] startsWithEmptyListValues() {

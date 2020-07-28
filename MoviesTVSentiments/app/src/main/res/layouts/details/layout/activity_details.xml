@@ -72,9 +72,12 @@
 
         <TextView
             android:id="@+id/asset_title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/bigPadding"
+            android:layout_marginRight="@dimen/bigPadding"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:text="Movie/Show Name"
             android:textColor="@color/text"
             android:textSize="20sp"
