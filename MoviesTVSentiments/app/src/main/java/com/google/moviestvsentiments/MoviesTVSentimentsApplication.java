@@ -23,8 +23,6 @@ public class MoviesTVSentimentsApplication extends ToastApplication implements C
     @Inject
     HiltWorkerFactory workerFactory;
 
-    private boolean toastDisplayed;
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -48,17 +46,5 @@ public class MoviesTVSentimentsApplication extends ToastApplication implements C
     @Override
     public Configuration getWorkManagerConfiguration() {
         return new Configuration.Builder().setWorkerFactory(workerFactory).build();
-    }
-
-    /**
-     * Displays a toast notifying the user that the app is in offline mode only if the toast
-     * has not already been displayed. This method should only be called on the main thread.
-     */
-    @Override
-    public void displayOfflineToast() {
-        if (!toastDisplayed) {
-            toastDisplayed = true;
-            super.displayOfflineToast();
-        }
     }
 }

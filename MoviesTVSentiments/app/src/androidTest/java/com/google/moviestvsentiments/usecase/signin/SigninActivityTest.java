@@ -13,6 +13,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibilit
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.google.moviestvsentiments.assertions.RecyclerViewItemCountAssertion.withItemCount;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.equalTo;
@@ -31,6 +32,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.test.espresso.intent.rule.IntentsTestRule;
 import androidx.test.espresso.matcher.ViewMatchers;
 import com.google.moviestvsentiments.R;
+import com.google.moviestvsentiments.ToastApplication;
 import com.google.moviestvsentiments.di.DatabaseModule;
 import com.google.moviestvsentiments.di.WebModule;
 import com.google.moviestvsentiments.usecase.addAccount.AddAccountActivity;
@@ -40,7 +42,8 @@ import com.google.moviestvsentiments.usecase.navigation.SentimentsNavigationActi
 @HiltAndroidTest
 public class SigninActivityTest {
 
-    IntentsTestRule<SigninActivity> intentsRule = new IntentsTestRule<>(SigninActivity.class);
+    IntentsTestRule<SigninActivity> intentsRule = new IntentsTestRule<>(SigninActivity.class, false,
+            false);
 
     @Rule
     public RuleChain rule = RuleChain.outerRule(new HiltAndroidRule(this))
@@ -49,30 +52,42 @@ public class SigninActivityTest {
 
     @Test
     public void serverError_displaysToast() {
+        ((ToastApplication)getInstrumentation().getTargetContext().getApplicationContext())
+                .resetToastDisplayed();
+        intentsRule.launchActivity(null);
+
         onView(withText(R.string.offlineToast)).inRoot(withDecorView(not(intentsRule.getActivity()
                 .getWindow().getDecorView()))).check(matches(isDisplayed()));
     }
 
     @Test
     public void signinActivity_displaysOnlyAddAccount() {
+        intentsRule.launchActivity(null);
+
         onView(withId(R.id.accountList)).check(withItemCount(1));
         onView(withId(R.id.accountTextView)).check(matches(withText("Add Account")));
     }
 
     @Test
     public void addAccount_displaysCorrectIcon() {
+        intentsRule.launchActivity(null);
+
         onView(withId(R.id.accountIcon)).check(matches(withTagValue(equalTo(
                 R.drawable.ic_baseline_person_add_24))));
     }
 
     @Test
     public void addAccount_hidesIconTextView() {
+        intentsRule.launchActivity(null);
+
         onView(withId(R.id.accountIconText)).check(matches(withEffectiveVisibility(
                 ViewMatchers.Visibility.GONE)));
     }
 
     @Test
     public void signinActivity_clickAddAccount_sendsIntentToAddAccountActivity() {
+        intentsRule.launchActivity(null);
+
         onView(withId(R.id.accountTextView)).perform(click());
 
         intended(hasComponent(AddAccountActivity.class.getName()));
@@ -80,6 +95,7 @@ public class SigninActivityTest {
 
     @Test
     public void signinActivity_addAccountResultCanceled_displaysOnlyAddAccount() {
+        intentsRule.launchActivity(null);
         ActivityResult result = new ActivityResult(Activity.RESULT_CANCELED, new Intent());
         intending(hasComponent(AddAccountActivity.class.getName())).respondWith(result);
 
@@ -91,6 +107,7 @@ public class SigninActivityTest {
 
     @Test
     public void signinActivity_addAccountResultOk_displaysNewAccount() {
+        intentsRule.launchActivity(null);
         Intent intent = new Intent();
         intent.putExtra(AddAccountActivity.EXTRA_ACCOUNT_NAME, "Account Name");
         ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
@@ -105,6 +122,7 @@ public class SigninActivityTest {
 
     @Test
     public void signinActivity_clickAccountName_sendsIntentToSentimentsNavigationActivity() {
+        intentsRule.launchActivity(null);
         Intent intent = new Intent();
         intent.putExtra(AddAccountActivity.EXTRA_ACCOUNT_NAME, "Account Name");
         ActivityResult result = new ActivityResult(Activity.RESULT_OK, intent);
