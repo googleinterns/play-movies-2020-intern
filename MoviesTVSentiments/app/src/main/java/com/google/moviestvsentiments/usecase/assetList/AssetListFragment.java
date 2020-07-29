@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import com.google.moviestvsentiments.R;
@@ -48,6 +49,11 @@ public class AssetListFragment extends Fragment implements AssetListAdapter.Asse
         accountName = getActivity().getIntent().getStringExtra(SigninActivity.EXTRA_ACCOUNT_NAME);
         SentimentType sentimentType = AssetListFragmentArgs.fromBundle(getArguments())
                 .getSentimentType();
+
+        if (sentimentType == SentimentType.UNSPECIFIED) {
+            TextView noAssetsLabel = root.findViewById(R.id.no_assets_label);
+            noAssetsLabel.setText(R.string.noUnspecifiedAssetLabel);
+        }
 
         viewModel.getAssets(AssetType.MOVIE, accountName, sentimentType)
             .observe(getViewLifecycleOwner(), moviesResource -> {

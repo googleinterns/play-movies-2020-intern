@@ -9,6 +9,7 @@ import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
 import static androidx.test.espresso.matcher.RootMatchers.withDecorView;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withTagValue;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -26,6 +27,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule;
 import androidx.fragment.app.Fragment;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.intent.Intents;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.rule.ActivityTestRule;
 import com.google.moviestvsentiments.HiltTestActivity;
 import com.google.moviestvsentiments.R;
@@ -102,7 +104,7 @@ public class AssetListFragmentTest {
                 .getActivity().getWindow().getDecorView()))).check(matches(isDisplayed()));
     }
 
-    private Object[] startsWithEmptyListValues() {
+    private Object[] sentimentTypeValues() {
         return new Object[] {
             new Object[] {SentimentType.UNSPECIFIED},
             new Object[] {SentimentType.THUMBS_UP},
@@ -111,13 +113,62 @@ public class AssetListFragmentTest {
     }
 
     @Test
-    @Parameters(method = "startsWithEmptyListValues")
+    @Parameters(method = "sentimentTypeValues")
     public void assetListFragment_startsWithEmptyList(SentimentType sentimentType) {
         HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
                 createFragmentArgs(sentimentType));
 
         onView(withId(R.id.movies_list)).check(withItemCount(0));
         onView(withId(R.id.tvshows_list)).check(withItemCount(0));
+    }
+
+    @Test
+    @Parameters(method = "sentimentTypeValues")
+    public void assetListFragment_emptyList_hidesRecyclerView(SentimentType sentimentType) {
+        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+                createFragmentArgs(sentimentType));
+
+        onView(withId(R.id.movies_list)).check(matches(withEffectiveVisibility(
+                ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.tvshows_list)).check(matches(withEffectiveVisibility(
+                ViewMatchers.Visibility.GONE)));
+    }
+
+    @Test
+    @Parameters(method = "sentimentTypeValues")
+    public void assetListFragment_emptyList_hidesLabels(SentimentType sentimentType) {
+        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+                createFragmentArgs(sentimentType));
+
+        onView(withId(R.id.movies_label)).check(matches(withEffectiveVisibility(
+                ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.tvshows_label)).check(matches(withEffectiveVisibility(
+                ViewMatchers.Visibility.GONE)));
+    }
+
+    private Object[] reactionSentimentTypeValues() {
+        return new Object[] {
+            new Object[] {SentimentType.THUMBS_UP},
+            new Object[] {SentimentType.THUMBS_DOWN}
+        };
+    }
+
+    @Test
+    @Parameters(method = "reactionSentimentTypeValues")
+    public void assetListFragment_emptyList_displaysNoAssetLabel(SentimentType sentimentType) {
+        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+                createFragmentArgs(sentimentType));
+
+        onView(withId(R.id.no_assets_label)).check(matches(withText(R.string.noAssetLabel)));
+    }
+
+    @Test
+    public void assetListFragment_emptyUnspecifiedList_displaysNoUnspecifiedAssetLabel() {
+        HiltFragmentScenario.launchHiltFragment(AssetListFragment.class,
+                createFragmentArgs(SentimentType.UNSPECIFIED));
+
+        onView(withId(R.id.no_assets_label)).check(matches(withText(
+                R.string.noUnspecifiedAssetLabel)));
     }
 
     private Object[] displaysAssetsWithSentimentValues() {
