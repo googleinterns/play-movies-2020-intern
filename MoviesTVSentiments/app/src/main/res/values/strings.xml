@@ -14,4 +14,6 @@
     <string name="signoutLabel">Sign Out</string>
     <string name="signinTitle">Sign In</string>
     <string name="offlineToast">Could not fetch data. Continuing in offline mode. Some results may be outdated.</string>
+    <string name="noAssetLabel">React to some movies or shows to see them on this screen.</string>
+    <string name="noUnspecifiedAssetLabel">Unable to fetch new movies and shows.</string>
 </resources>
