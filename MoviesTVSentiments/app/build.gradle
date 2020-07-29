@@ -137,4 +137,7 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
     androidTestImplementation "pl.pragmatists:JUnitParams:1.1.1"
     testImplementation "pl.pragmatists:JUnitParams:1.1.1"
+
+    // UI Automator
+    androidTestImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
 }
