@@ -47,6 +47,7 @@ public class SentimentsNavigationActivity extends AppCompatActivity implements
 
         viewModel.getCurrentAccount().observe(this, account -> {
             if (account == null) {
+                viewModel.getCurrentAccount().removeObservers(this);
                 Intent intent = new Intent(this, SigninActivity.class);
                 startActivity(intent);
                 finish();
