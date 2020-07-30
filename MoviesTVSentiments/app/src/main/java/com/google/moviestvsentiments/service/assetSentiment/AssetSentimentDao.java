@@ -11,7 +11,6 @@ import com.google.moviestvsentiments.model.AssetSentiment;
 import com.google.moviestvsentiments.model.AssetType;
 import com.google.moviestvsentiments.model.SentimentType;
 import com.google.moviestvsentiments.model.UserSentiment;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,13 @@ public abstract class AssetSentimentDao {
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void addAsset(Asset asset);
+
+    /**
+     * Adds the given list of assets into the assets table. Existing assets are ignored.
+     * @param assets The list of assets to insert.
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    public abstract void addAssets(List<Asset> assets);
 
     /**
      * Returns a LiveData view of the asset with the given id and type or null if the asset does not
