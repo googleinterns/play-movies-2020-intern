@@ -15,6 +15,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
@@ -90,12 +91,15 @@ public class AssetSentimentRepository {
             @Override
             protected void saveCallResult(List<AssetSentiment> assetSentiments) {
                 executor.execute(() -> {
-                    for (AssetSentiment assetSentiment : assetSentiments) {
-                        Asset asset = assetSentiment.asset();
-                        assetSentimentDao.addAsset(asset);
-                        assetSentimentDao.updateSentiment(accountName, asset.id(), assetType,
-                                assetSentiment.sentimentType(), false, Instant.now(clock));
-                    }
+                    List<Asset> assets = assetSentiments.stream().map(
+                            assetSentiment -> assetSentiment.asset()).collect(Collectors.toList());
+                    List<UserSentiment> sentiments = assetSentiments.stream().map(assetSentiment ->
+                            UserSentiment.create(assetSentiment.asset().id(), accountName, assetType,
+                                    assetSentiment.sentimentType(), Instant.now(clock), false))
+                            .collect(Collectors.toList());
+
+                    assetSentimentDao.addAssets(assets);
+                    assetSentimentDao.updateSentiments(sentiments);
                 });
             }
 

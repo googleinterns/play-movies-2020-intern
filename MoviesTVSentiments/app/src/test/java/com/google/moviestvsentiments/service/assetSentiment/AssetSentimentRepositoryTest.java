@@ -1,7 +1,9 @@
 package com.google.moviestvsentiments.service.assetSentiment;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.moviestvsentiments.util.UserSentimentListMatcher.containsUserSentiments;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -107,13 +109,13 @@ public class AssetSentimentRepositoryTest {
         when(webService.getAssets(AssetType.SHOW, ACCOUNT_NAME, SentimentType.UNSPECIFIED))
                 .thenReturn(remoteData);
 
-        Resource<List<AssetSentiment>> result = LiveDataTestUtil.getValue(
-                repository.getAssets(AssetType.SHOW, ACCOUNT_NAME, SentimentType.UNSPECIFIED));
+        LiveDataTestUtil.getValue(repository.getAssets(AssetType.SHOW, ACCOUNT_NAME,
+                SentimentType.UNSPECIFIED));
 
-        verify(dao, times(1)).addAsset(remoteSentiment.asset());
-        verify(dao, times(1)).updateSentiment(ACCOUNT_NAME,
-                remoteSentiment.asset().id(), AssetType.SHOW, SentimentType.UNSPECIFIED,
-                false, Instant.EPOCH);
+        verify(dao).addAssets(Arrays.asList(remoteSentiment.asset()));
+        verify(dao).updateSentiments(argThat(containsUserSentiments(UserSentiment.create(
+                remoteSentiment.asset().id(), ACCOUNT_NAME, AssetType.SHOW, SentimentType.UNSPECIFIED,
+                Instant.EPOCH, false))));
     }
 
     @Test
